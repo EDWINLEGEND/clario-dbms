@@ -96,7 +96,7 @@ export function AvatarGroup({ users, max = 3, size = "md", className }: AvatarGr
             "flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800",
             "border-2 border-white dark:border-gray-800",
             "text-xs font-medium text-gray-600 dark:text-gray-300",
-            sizeMap[size]
+            sizeMap[size as keyof typeof sizeMap]
           )}
         >
           +{remainingCount}
@@ -106,8 +106,8 @@ export function AvatarGroup({ users, max = 3, size = "md", className }: AvatarGr
   );
 }
 
-+const sizeMap = {
-+  sm: "w-8 h-8",
-+  md: "w-10 h-10",
-+  lg: "w-12 h-12",
-+};
+const sizeMap = {
+  sm: "w-8 h-8",
+  md: "w-10 h-10",
+  lg: "w-12 h-12",
+} as const;

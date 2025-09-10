@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from "framer-motion";
+import { motion, type Variants, type Transition } from "framer-motion";
 import { ReactNode } from 'react';
 
 interface PageTransitionProps {
@@ -8,7 +8,7 @@ interface PageTransitionProps {
   className?: string;
 }
 
-const pageVariants = {
+const pageVariants: Variants = {
   initial: {
     opacity: 0,
     y: 20,
@@ -26,9 +26,9 @@ const pageVariants = {
   },
 };
 
-const pageTransition = {
+const pageTransition: Transition = {
   type: 'tween',
-  ease: 'anticipate',
+  ease: 'easeInOut',
   duration: 0.4,
 };
 
@@ -48,7 +48,7 @@ export const PageTransition = ({ children, className }: PageTransitionProps) => 
 };
 
 // Tab transition variants
-export const tabVariants = {
+export const tabVariants: Variants = {
   initial: {
     opacity: 0,
     x: 10,
@@ -63,14 +63,14 @@ export const tabVariants = {
   },
 };
 
-export const tabTransition = {
+export const tabTransition: Transition = {
   type: 'tween',
   ease: 'easeInOut',
   duration: 0.2,
 };
 
 // Stagger animation for lists
-export const staggerContainer = {
+export const staggerContainer: Variants = {
   initial: {},
   in: {
     transition: {
@@ -80,7 +80,7 @@ export const staggerContainer = {
   },
 };
 
-export const staggerItem = {
+export const staggerItem: Variants = {
   initial: {
     opacity: 0,
     y: 20,
@@ -104,7 +104,7 @@ export const hoverScale = {
     stiffness: 400,
     damping: 10,
   },
-};
+} as const;
 
 export const tapScale = {
   scale: 0.98,
@@ -113,10 +113,10 @@ export const tapScale = {
     stiffness: 400,
     damping: 10,
   },
-};
+} as const;
 
 // Loading animation
-export const loadingVariants = {
+export const loadingVariants: Variants = {
   initial: {
     opacity: 0,
     scale: 0.8,

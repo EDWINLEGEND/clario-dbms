@@ -1,23 +1,23 @@
-'use client';
+"use client";
 
-import { Card, CardBody, Skeleton } from '@nextui-org/react';
-import { motion } from 'framer-motion';
-import { loadingVariants } from './PageTransition';
+import { Card, CardBody, Skeleton } from "@heroui/react";
+import { motion } from "framer-motion";
+import { loadingVariants } from "./PageTransition";
 
 interface LoadingSkeletonProps {
-  variant?: 'card' | 'list' | 'stats' | 'course' | 'track' | 'project';
+  variant?: "card" | "list" | "stats" | "course" | "track" | "project";
   count?: number;
   className?: string;
 }
 
-export const LoadingSkeleton = ({ 
-  variant = 'card', 
-  count = 1, 
-  className = '' 
+export const LoadingSkeleton = ({
+  variant = "card",
+  count = 1,
+  className = "",
 }: LoadingSkeletonProps) => {
   const renderSkeleton = () => {
     switch (variant) {
-      case 'card':
+      case "card":
         return (
           <Card className="w-full space-y-5 p-4" radius="lg">
             <Skeleton className="rounded-lg">
@@ -37,7 +37,7 @@ export const LoadingSkeleton = ({
           </Card>
         );
 
-      case 'list':
+      case "list":
         return (
           <Card className="w-full p-4" radius="lg">
             <CardBody className="flex flex-row items-center gap-4">
@@ -51,7 +51,7 @@ export const LoadingSkeleton = ({
           </Card>
         );
 
-      case 'stats':
+      case "stats":
         return (
           <Card className="w-full p-4" radius="lg">
             <CardBody className="flex flex-row items-center gap-4">
@@ -64,7 +64,7 @@ export const LoadingSkeleton = ({
           </Card>
         );
 
-      case 'course':
+      case "course":
         return (
           <Card className="w-full space-y-4 p-4" radius="lg">
             <Skeleton className="rounded-lg">
@@ -89,7 +89,7 @@ export const LoadingSkeleton = ({
           </Card>
         );
 
-      case 'track':
+      case "track":
         return (
           <Card className="w-full space-y-4 p-4" radius="lg">
             <div className="flex items-center gap-2 mb-3">
@@ -117,7 +117,7 @@ export const LoadingSkeleton = ({
           </Card>
         );
 
-      case 'project':
+      case "project":
         return (
           <Card className="w-full space-y-4 p-4" radius="lg">
             <div className="flex items-center gap-2 mb-3">
@@ -165,7 +165,7 @@ export const LoadingSkeleton = ({
   };
 
   return (
-    <motion.div 
+    <motion.div
       className={`grid gap-4 ${className}`}
       variants={loadingVariants}
       initial="initial"
@@ -177,15 +177,15 @@ export const LoadingSkeleton = ({
           key={index}
           variants={{
             initial: { opacity: 0, y: 20 },
-            animate: { 
-              opacity: 1, 
+            animate: {
+              opacity: 1,
               y: 0,
               transition: {
                 delay: index * 0.1,
                 duration: 0.3,
-                ease: 'easeOut'
-              }
-            }
+                ease: "easeOut",
+              },
+            },
           }}
         >
           {renderSkeleton()}
@@ -197,41 +197,41 @@ export const LoadingSkeleton = ({
 
 // Specialized skeleton components
 export const CourseGridSkeleton = ({ count = 8 }: { count?: number }) => (
-  <LoadingSkeleton 
-    variant="course" 
-    count={count} 
-    className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" 
+  <LoadingSkeleton
+    variant="course"
+    count={count}
+    className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
   />
 );
 
 export const TrackGridSkeleton = ({ count = 6 }: { count?: number }) => (
-  <LoadingSkeleton 
-    variant="track" 
-    count={count} 
-    className="grid-cols-1 md:grid-cols-2 xl:grid-cols-3" 
+  <LoadingSkeleton
+    variant="track"
+    count={count}
+    className="grid-cols-1 md:grid-cols-2 xl:grid-cols-3"
   />
 );
 
 export const ProjectGridSkeleton = ({ count = 6 }: { count?: number }) => (
-  <LoadingSkeleton 
-    variant="project" 
-    count={count} 
-    className="grid-cols-1 md:grid-cols-2 lg:grid-cols-3" 
+  <LoadingSkeleton
+    variant="project"
+    count={count}
+    className="grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
   />
 );
 
 export const StatsGridSkeleton = ({ count = 4 }: { count?: number }) => (
-  <LoadingSkeleton 
-    variant="stats" 
-    count={count} 
-    className="grid-cols-1 md:grid-cols-2 lg:grid-cols-4" 
+  <LoadingSkeleton
+    variant="stats"
+    count={count}
+    className="grid-cols-1 md:grid-cols-2 lg:grid-cols-4"
   />
 );
 
 export const ListSkeleton = ({ count = 5 }: { count?: number }) => (
-  <LoadingSkeleton 
-    variant="list" 
-    count={count} 
-    className="grid-cols-1" 
+  <LoadingSkeleton
+    variant="list"
+    count={count}
+    className="grid-cols-1"
   />
 );
