@@ -1,0 +1,7 @@
+cd backend
+npm run dev
+
+cd infra
+d compose
+cd..
+

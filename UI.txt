@@ -1,0 +1,231 @@
+Nice. You wanted the full, annoying-but-necessary blueprint so engineers don’t guess and break everything. Below is a detailed UI flow for **CLARIO** built as an app-shell, non-scrollable homepage with a floating bottom nav, drop-ups, and strict two-tone theming (light = white, dark = black). Read it, copy it, implement it, and spare the team the “it looked different on my screen” grief.
+
+# Detailed UI Flow — CLARIO (app-shell, two-tone, floating bottom nav)
+
+## 1) High-level overview
+
+* App shell persists: **Top header (desktop)** optional, **Sidebar removed**, **Bottom floating nav** is the single persistent element across pages.
+* **Homepage (/) is static — non-scrollable** (`overflow-hidden` for html/body). The rest of pages use the app-shell content panel that can scroll (`overflow-y-auto` only inside the content area).
+* Theme: two modes only — **Light** (background white, text black) and **Dark** (background black, text white). **Default = Light**. Toggle stored in `localStorage` (use `next-themes` or small custom hook).
+* Nav items (migrated from sidebar): **Home**, **Learn**, **Tracks**, **Projects**, **Login/Account** + **Search** inside bottom nav and **Profile/avatar** with drop-up.
+* Drop-ups: every submenu opens *upwards* from the floating nav. Use a portal so they aren’t clipped.
+
+---
+
+## 2) Component map (where flows start)
+
+* `AppShell` — root layout with theme provider, motion provider; mounts `BottomNav`.
+* `BottomNav` (`components/molecules/BottomNav.tsx`) — floating bar with search, nav items, avatar, theme toggle.
+* `SearchBar` — inside `BottomNav`, client component; opens results overlay (drop-up) when typing.
+* `ProfileMenu` — avatar menu; drop-up panel with Profile/Settings/Logout.
+* `PageContainer` — content wrapper used by pages; for homepage it’s empty and non-scrollable; for others it has `overflow-y-auto`.
+* Pages: `Home`, `Learn`, `Tracks`, `Projects`, `CourseDetail`, `Lesson`, `Dashboard`, `Auth`, `Admin`.
+* `Modal`, `Popover`, `Toast`, `Skeletons` — supporting UI.
+
+Files you already have: `BottomNav.tsx`, `AppShell.tsx` — replace or adapt them.
+
+---
+
+## 3) Entry flows (step-by-step)
+
+### 3.1 First visit (unauthenticated) — Home (`/`)
+
+**Preconditions:** No user session, `theme` = light (default).
+
+1. Browser loads root layout. `html, body` set `overflow-hidden` to prevent page scroll.
+2. `AppShell` renders full-viewport empty content area with huge translucent “CLARIO” text near the bottom (absolutely positioned), filler is a plain white image placeholder if an image is required.
+3. `BottomNav` mounts fixed centered at bottom with `rounded-full` or `rounded-2xl` ends and `shadow-md`. It contains:
+
+   * Search input (placeholder: “Search courses, projects, tracks…”).
+   * Nav items: Home, Projects, Ask (plus Learn/Tracks per your sidebar mapping).
+   * Avatar/login button on the right.
+   * Theme toggle.
+4. Interactions:
+
+   * Clicking **Home** does nothing (already on home). Focus ring visible for keyboard users.
+   * Clicking **Projects** or other item navigates to the route using Next.js `<Link>` (prefetch). Because homepage is static, navigation triggers app-shell content swap (page transition).
+   * Clicking search input opens the **drop-up results panel** immediately (overlay above nav). Input autofocus optional on mobile.
+5. Visuals: large “CLARIO” text is visible across bottom behind the nav (use z-index so nav floats above it).
+
+### 3.2 Search flow (from bottom nav)
+
+**Preconditions:** Search component is client-side with debounce.
+
+1. User focuses the search input; drop-up panel appears above the nav with subtle animation (`translateY` -8px → 0 and opacity).
+2. User types; debounce (250–350ms) triggers `GET /api/search?q=...`.
+3. While waiting: show skeleton rows in drop-up.
+4. On response: show results grouped (Courses, Projects, Tracks) with keyboard arrow navigation and `Enter` to open. Esc closes drop-up.
+5. If network error: show inline error row with retry.
+6. Selecting a result navigates content panel to target route (no full page reload). Close drop-up.
+
+### 3.3 Navigation between pages (app-shell behavior)
+
+1. Click nav item (e.g., Projects) → next/link navigates to `/projects` — Next.js App Router handles routing.
+2. `PageContainer` mounts the new page component inside the shell; content area gets `overflow-y-auto` (unless the route is explicitly non-scrollable).
+3. Animate transition: use Framer Motion `AnimatePresence` for a subtle fade/slide.
+4. Prefetching: Next.js prefetch on hover or in viewport for faster feel.
+
+### 3.4 Profile / Login flow
+
+1. If unauthenticated, avatar shows “Login” label. Click → open auth modal or navigate to `/auth`.
+2. If authenticated, clicking avatar opens `ProfileMenu` drop-up with:
+
+   * Profile, Settings, Theme toggle, Logout.
+3. ProfileMenu is keyboard accessible: `role="menu"`, focus trap not required but manage focus return to avatar on close.
+4. Logout clears session and optionally shows toast.
+
+### 3.5 Theme toggle
+
+1. Toggle in `BottomNav` switches between light and dark instantly. Implementation:
+
+   * Use `document.documentElement.setAttribute('data-theme', 'dark')` or `class="dark"` with Tailwind `dark:` utilities.
+   * Persist choice in `localStorage` and fall back to `'light'`.
+   * Avoid FOUC: set theme class server-side or using inline script that reads localStorage before render.
+
+---
+
+## 4) Detailed page flows
+
+### 4.1 Learn (/learn) — catalog browse
+
+* Default: server component fetches initial results (`/api/courses?limit=24`) for SEO and speed.
+* Client-side: filters, facets, search (inside the page) use client actions & fetch `/api/courses?...`.
+* Pagination/infinite scroll handled in content container (not homepage). Show skeleton cards.
+
+### 4.2 Tracks (/tracks)
+
+* List of tracks with progress bars (progress from `/api/users/:id/progress`).
+* Clicking track opens `/tracks/[id]` with syllabus, start/resume CTA (client action to enroll: `POST /api/tracks/:id/enroll`).
+
+### 4.3 Projects (/projects)
+
+* Filterable grid. Clicking a project opens modal (preferred) or detail page (`/projects/[id]`).
+* Start Project button clones starter repo or marks as started (API call).
+
+### 4.4 Course Detail / Lesson / Player
+
+* Course page: sticky progress sidebar inside `PageContainer`. Use `position: sticky` with `overflow-y-auto` content.
+* Lesson player: video + transcript sections. Controls persist in the shell (no nav shift).
+* Saving notes and completion: client POST to `/api/lessons/:id/notes` and `/api/lessons/:id/complete` (optimistic UI updates).
+
+### 4.5 Quiz Flow
+
+* Quiz runner client component, timer, autosave answers locally until submission.
+* Submit → `POST /api/quizzes/:id/submit`. Show results page or modal.
+
+---
+
+## 5) Submenu/drop-up behavior (important)
+
+* Implementation:
+
+  * Render drop-ups with a portal (`createPortal`) so they escape nav clipping and handle safe area.
+  * Positioning: anchored to nav item center; calculate translateY negative to go upward.
+  * Use `aria-haspopup="true"`, `aria-expanded`, and `role="menu"`.
+  * Close on outside click / Escape / route change.
+* Animation: `transition transform 180ms cubic-bezier`, `opacity 120ms`.
+* Z-index: ensure drop-ups are above CLARIO text and above overlays.
+
+---
+
+## 6) Data & API pattern
+
+* **Server components** for initial render: course lists, track lists, project lists (`fetch` with `cache: 'no-store'` or revalidate).
+* **Client components** for interactive UIs: SearchBar, ProfileMenu, Lesson controls, Quiz, Auth forms.
+* API endpoints suggested:
+
+  * `GET /api/search?q=`
+  * `GET /api/courses`, `GET /api/courses/:id`
+  * `GET /api/tracks`, `GET /api/tracks/:id`
+  * `GET /api/projects`, `GET /api/projects/:id`
+  * `POST /api/enroll`, `/api/lessons/:id/complete`, `/api/quizzes/:id/submit`
+* Caching: use server-side caching on slow-changing endpoints; client-side SWR or useSWR for optimistic cache and revalidation.
+
+---
+
+## 7) State management & persistence
+
+* Theme: `next-themes` or small hook -> persist in `localStorage`.
+* Auth: JWT in httpOnly cookie; auth context on client for UI.
+* Nav state: local state in `BottomNav` for active item; route change resets active.
+* Search state: local state + debounce; optionally persist last query in sessionStorage.
+
+---
+
+## 8) Accessibility & keyboard flow
+
+* All interactive elements have focus states (visible ring) and `aria-*` labels.
+* BottomNav keyboard accessibility:
+
+  * Tab order: Search input → Nav items → Theme toggle → Avatar.
+  * Arrow keys should move inside drop-up menus.
+  * Provide `sr-only` labels for icons.
+* Contrast: Light (black text #000 on #fff), Dark (white #fff on #000) — meets AA automatically in two-tone.
+
+---
+
+## 9) Error handling & edge cases
+
+* Network errors: show inline messages in drop-ups and page-level banners.
+* Empty states: friendly copy + CTA to Learn/Projects.
+* Offline: disable search, show offline toast.
+* Mobile safe area: padding-bottom for safe-inset when nav is floating (`env(safe-area-inset-bottom)`).
+* Focus loss on route change: return focus to a sensible element.
+
+---
+
+## 10) Animations & performance
+
+* Animations are subtle and short (120–240ms). Respect reduced-motion media query.
+* Use `will-change: transform` sparingly for smoother animations on drop-ups and nav.
+* Avoid heavy animations on homepage (it’s static).
+
+---
+
+## 11) Logging / analytics (events to capture)
+
+* `ui.nav.click` {item, route}
+* `ui.search.query` {query, resultsCount}
+* `ui.theme.toggle` {from, to}
+* `ui.profile.open` / `ui.profile.logout`
+* `course.enroll` / `project.start`
+* `error.fetch` {endpoint, status}
+
+---
+
+## 12) Testing checklist (QA / acceptance)
+
+* Theme toggles instantly and persists.
+* Homepage does not scroll (html/body `overflow-hidden`).
+* Bottom nav floats centered with correct roundness and shadow.
+* Drop-ups open upward, animate, close on outside click/Esc/route change.
+* Search opens drop-up; debounced API calls; keyboard navigation works.
+* Avatar menu items functional (profile/settings/logout).
+* Route navigation swaps content without full page refresh and keeps nav persistent.
+* Focus management and ARIA attributes present.
+* Safe area insets respected (iPhone notch).
+* No console errors in dev/prod builds.
+* Accessibility: run axe, fix any AA-level violations.
+
+---
+
+## 13) Implementation hints (practical)
+
+* Use `position: fixed; bottom: clamp(12px, 2.5vh, 28px); left: 50%; transform: translateX(-50%)` for nav center.
+* Use `backdrop-filter: blur(6px)` sparingly if you like the glass look — but you said two-tone only, so keep it minimal.
+* For huge background CLARIO text: absolute center-bottom with very large `font-size: clamp(64px, 12vw, 220px)` and `pointer-events: none`.
+* Render drop-ups with `ReactDOM.createPortal` to `document.body` and calculate position using `getBoundingClientRect()` for pixel-perfect anchors.
+* Keep `BottomNav` as a client component (`"use client"`) because it handles theme switching and interactions.
+
+---
+
+## 14) Deliverables & acceptance (short)
+
+* `AppShell` + `BottomNav` implemented and replaces old sidebar.
+* Homepage static with full-screen CLARIO text and floating centered nav.
+* Two-tone theme toggle working, default = light.
+* Drop-ups open upward; search in nav works with mocked API (white placeholder images).
+* No scrolling on homepage; content pages scroll inside `PageContainer`.
+* Accessibility and QA checklist passed.
+
+There. If you implement exactly to this flow, CLARIO will behave like a well-mannered web app and stop pretending to be a brochure. Use this as your dev spec and handoff checklist.

@@ -1,0 +1,237 @@
+Product Requirements Document (PRD) — Clario
+1. Overview
+
+Product Name: Clario
+Vision: Help students and self-learners upskill efficiently by personalizing YouTube content to their learning style, while driving consistency through project milestones and accountability nudges.
+Target Users:
+
+College students seeking structured upskilling.
+
+Independent learners balancing courses + projects.
+
+Early professionals upgrading skills while managing deadlines.
+
+MVP Goal: Validate that personalized recommendations + accountability reminders improve project completion and sustained learning.
+
+2. Objectives & Success Criteria
+
+Objectives:
+
+Onboard users with learning type profiling.
+
+Deliver personalized video recommendations.
+
+Support project-based learning with milestones.
+
+Provide accountability nudges via reminders and optional fee system.
+
+MVP Success Criteria:
+
+≥70% onboarding questionnaire completion.
+
+≥60% of users interact with at least 3 recommended videos in feed.
+
+≥50% of created projects have ≥1 milestone completed.
+
+≥40% of users engage with at least one reminder channel.
+
+Retention ≥30% after 1 week.
+
+3. Core Features (MVP Scope)
+3.1 User Onboarding & Profile
+
+Google Sign-In (OAuth).
+
+1-min questionnaire → assigns learning type.
+
+Profile: shows learning type, projects, history.
+
+3.2 Video Recommendation Engine
+
+Search bar → YouTube API.
+
+Personalized feed scored for learning type compatibility.
+
+Scoring Logic (MVP Simple Formula):
+
+Compatibility Score = (Keyword Match % × 0.7) + (Learning Type Weight × 0.3)
+- Keyword Match %: #matched tags / total tags
+- Learning Type Weight: 1 if video tagged with user’s type, else 0
+Output normalized to 0–100
+
+3.3 Projects & Milestones
+
+Create/edit/delete projects.
+
+Add milestones with due dates + status.
+
+Progress = (#completed milestones / total milestones) × 100.
+
+Edge case: Project with no milestones → auto-progress = 0%.
+
+3.4 Accountability System
+
+Users can deposit demo credits when creating project.
+
+Rules:
+
+If all milestones completed on time → credits “refunded.”
+
+If deadlines missed → credits marked “forfeited” (demo only, no real payment).
+
+Users see balance in profile.
+
+3.5 Reminders & Notifications
+
+Email: 2 days before milestone due.
+
+WhatsApp: On due date.
+
+AI Call (Twilio + ElevenLabs): Weekly, default Saturday 6 PM IST. User can reschedule in profile settings.
+
+Failure fallback: If WhatsApp/Call fails → send email.
+
+Compliance:
+
+WhatsApp reminders require explicit opt-in during onboarding.
+
+Calls are demo-only (trial Twilio).
+
+4. Out-of-Scope (MVP)
+
+Real payments (Stripe/Razorpay).
+
+Team/peer projects.
+
+AI mentor bot.
+
+Leaderboards, community, gamification.
+
+Dark mode, advanced UI polish.
+
+5. Data Model
+5.1 Entities & Relationships
+
+User → has 1 LearningType, many Projects, many Reminders.
+
+Project → belongs to 1 User, has many Milestones, may have 1 AccountabilityFee.
+
+Video → has many VideoTags.
+
+VideoTag → links Video to LearningType.
+
+Reminder → belongs to User and optionally to a Milestone.
+
+5.2 Database Schema (3NF)
+
+(Already normalized, repeating groups split into separate tables)
+
+Users(user_id PK, name, email unique, learning_type_id FK, created_at)
+LearningTypes(learning_type_id PK, type_name, description)
+Videos(video_id PK, title, description, transcript, created_at)
+VideoTags(tag_id PK, video_id FK, learning_type_id FK, keyword, score)
+Projects(project_id PK, user_id FK, title, description, deadline, created_at)
+Milestones(milestone_id PK, project_id FK, title, due_date, status)
+Reminders(reminder_id PK, user_id FK, milestone_id FK nullable, channel, send_date, status)
+AccountabilityFees(fee_id PK, user_id FK, project_id FK, amount, status)
+
+6. ER Diagram (Textual Representation)
+Users (1) ─── (∞) Projects (1) ─── (∞) Milestones
+Users (1) ─── (∞) Reminders ─── (0..1) Milestones
+Users (∞) ─── (1) LearningTypes
+Projects (1) ─── (0..1) AccountabilityFees
+Videos (1) ─── (∞) VideoTags (∞) ─── (1) LearningTypes
+
+7. API Contracts (High-Level)
+
+Auth
+
+POST /auth/google → returns JWT + user profile
+
+User
+
+GET /user/{id} → profile + learning type + stats
+
+Videos
+
+GET /videos?search=query → list of YouTube videos + compatibility scores
+
+GET /videos/{id} → details + transcript + tags
+
+Projects
+
+POST /projects → create
+
+GET /projects/{id} → project + milestones
+
+PATCH /projects/{id} → update
+
+DELETE /projects/{id}
+
+Milestones
+
+POST /projects/{id}/milestones
+
+PATCH /milestones/{id} (update status)
+
+Reminders
+
+POST /reminders → schedule reminder
+
+GET /reminders/{user_id}
+
+AccountabilityFees
+
+POST /projects/{id}/fee → lock credits
+
+PATCH /fees/{id} → update status
+
+8. Non-Functional Requirements
+
+Performance: Feed loads in <2s for 20 videos.
+
+Scalability: n8n handles ≤1,000 reminder jobs/month. Future → job queue (BullMQ/Redis).
+
+Reliability: Retry reminder delivery up to 3 times.
+
+Security: JWT auth, HTTPS, hashed stored data.
+
+Privacy: No sharing of transcripts/learning profiles; GDPR-lite compliance.
+
+9. Edge Cases
+
+Missing transcripts: If YouTube has no transcript → mark video “incompatible” (score = 0).
+
+Project without milestones: Auto-progress = 0%, reminders tied only to project deadline.
+
+Failed reminders: Retry → fallback to email → log failure.
+
+Expired deadlines: System sends “Deadline passed” notice.
+
+10. Risks & Mitigations
+Risk	Impact	Mitigation
+YouTube quota exceeded	Empty feeds	Cache top results, show fallback library
+Twilio/WhatsApp fail	No accountability reminders	Always fallback to email
+Users confused by demo fees	Drop-off	Add disclaimer banner “Demo credits only”
+Low engagement after onboarding	Weak MVP validation	Add quick wins: progress % bar, streak counter
+11. Analytics & Metrics
+
+Onboarding completion rate.
+
+Retention D1/D7/D30.
+
+Avg. projects per user.
+
+Avg. milestones per project.
+
+% of reminders delivered vs. failed.
+
+Video engagement: clicks/watch-through rate.
+
+Benchmarks:
+
+≥70% onboarding → healthy.
+
+≥3 projects/user/month → engaged.
+
+≥50% reminders opened/responded → effective accountability.
