@@ -151,6 +151,12 @@ export function SearchBar({
           "bg-background/50 backdrop-blur-sm",
           isFocused && "shadow-lg scale-[1.02]"
         )}
+        classNames={{
+          input: "text-sm pl-2 pr-2",
+          inputWrapper: "h-10 px-3",
+          label: "text-sm font-medium",
+          mainWrapper: "h-auto",
+        }}
         startContent={
           <motion.div
             animate={{ 

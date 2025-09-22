@@ -24,7 +24,7 @@ import {
   Play,
   CheckCircle,
   ArrowRight,
-  Fire,
+  Flame,
   Users,
   Star,
 } from "lucide-react";
@@ -95,7 +95,7 @@ const mockCourses: Course[] = [
     id: "1",
     title: "React Fundamentals",
     description: "Learn the basics of React",
-    thumbnail: "/api/placeholder/400/225",
+    thumbnail: "/test.jpg",
     instructor: {
       id: "1",
       name: "Sarah Johnson",
@@ -121,7 +121,7 @@ const mockCourses: Course[] = [
     id: "2",
     title: "Advanced TypeScript",
     description: "Master TypeScript concepts",
-    thumbnail: "/api/placeholder/400/225",
+    thumbnail: "/test.jpg",
     instructor: {
       id: "2",
       name: "Mike Chen",
@@ -151,7 +151,7 @@ const recommendedCourses: Course[] = [
     id: "3",
     title: "Node.js Backend Development",
     description: "Build scalable backend applications",
-    thumbnail: "/api/placeholder/400/225",
+    thumbnail: "/test.jpg",
     instructor: {
       id: "3",
       name: "Emma Davis",
@@ -243,7 +243,7 @@ function ActivityItem({ type, title, description, timestamp, icon: Icon }: Activ
     course_completed: { color: "success", defaultIcon: CheckCircle },
     lesson_completed: { color: "primary", defaultIcon: Play },
     badge_earned: { color: "warning", defaultIcon: Award },
-    streak_milestone: { color: "danger", defaultIcon: Fire },
+    streak_milestone: { color: "danger", defaultIcon: Flame },
   };
 
   const config = typeConfig[type];
@@ -329,7 +329,7 @@ export default function DashboardPage() {
                 <div className="text-right">
                   <p className="text-sm text-muted-foreground">Current Streak</p>
                   <div className="flex items-center gap-2">
-                    <Fire className="h-5 w-5 text-orange-500" />
+                    <Flame className="h-5 w-5 text-orange-500" />
                     <span className="font-bold text-lg">{currentStreak} days</span>
                   </div>
                 </div>

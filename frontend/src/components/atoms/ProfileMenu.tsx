@@ -19,6 +19,17 @@ import { Avatar, Button, Divider, Badge } from "@heroui/react";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 
+// Define a common type for menu items to maintain strict typing across defaults and customs
+type MenuItem = {
+  id: string;
+  label: string;
+  icon: React.ReactNode;
+  onClick: () => void;
+  variant?: "default" | "danger" | "warning";
+  badge?: string | number;
+  disabled?: boolean;
+};
+
 interface ProfileMenuProps {
   user: {
     name: string;
@@ -116,7 +127,7 @@ export function ProfileMenu({
     return resolvedTheme === "dark" ? "Dark" : "Light";
   };
 
-  const defaultMenuItems = [
+  const defaultMenuItems: MenuItem[] = [
     {
       id: "profile",
       label: "Profile",
@@ -162,7 +173,7 @@ export function ProfileMenu({
     }
   ];
 
-  const allMenuItems = [...defaultMenuItems, ...customMenuItems];
+  const allMenuItems: MenuItem[] = [...defaultMenuItems, ...customMenuItems];
 
   return (
     <div ref={menuRef} className={cn("relative", className)}>
@@ -195,7 +206,9 @@ export function ProfileMenu({
                 shape="circle"
                 size="sm"
                 className="border-2 border-background"
-              />
+              >
+                <span className="sr-only">Verified</span>
+              </Badge>
             </div>
           )}
         </div>
@@ -271,7 +284,7 @@ export function ProfileMenu({
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05, duration: 0.2 }}
                     onClick={item.onClick}
-                    disabled={item.disabled}
+                    disabled={"disabled" in item ? !!item.disabled : false}
                     className={cn(
                       "w-full flex items-center gap-3 px-4 py-3",
                       "text-left text-sm transition-colors duration-200",
@@ -290,7 +303,9 @@ export function ProfileMenu({
                         color="primary"
                         size="sm"
                         variant="flat"
-                      />
+                      >
+                        <span className="sr-only">badge</span>
+                      </Badge>
                     )}
                     <ChevronRight className="h-3 w-3 text-muted-foreground" />
                   </motion.button>
@@ -313,11 +328,11 @@ export function ProfileMenu({
                     )}
                   >
                     <motion.div
-                      key={theme + resolvedTheme}
+                      key={`${theme ?? "system"}-${resolvedTheme ?? ""}`}
+                      className="flex-shrink-0 text-muted-foreground"
                       initial={{ scale: 0.8, rotate: -180 }}
                       animate={{ scale: 1, rotate: 0 }}
                       transition={{ duration: 0.3, ease: "easeOut" }}
-                      className="flex-shrink-0 text-muted-foreground"
                     >
                       {getThemeIcon()}
                     </motion.div>

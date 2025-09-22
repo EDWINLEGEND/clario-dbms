@@ -31,7 +31,7 @@ const mockProjects: Project[] = [
     id: "1",
     title: "E-commerce Platform",
     description: "Build a full-stack e-commerce platform with React, Node.js, and MongoDB. Implement user authentication, product catalog, shopping cart, and payment processing.",
-    thumbnail: "/api/placeholder/400/300",
+    thumbnail: "/test.jpg",
     difficulty: "hard",
     estimatedTime: 2400, // 40 hours
     technologies: ["React", "Node.js", "MongoDB", "Stripe", "JWT"],
@@ -55,7 +55,7 @@ const mockProjects: Project[] = [
     id: "2",
     title: "Data Visualization Dashboard",
     description: "Create an interactive dashboard using Python, Pandas, and Plotly. Analyze real-world datasets and create compelling visualizations for business insights.",
-    thumbnail: "/api/placeholder/400/300",
+    thumbnail: "/test.jpg",
     difficulty: "medium",
     estimatedTime: 1800, // 30 hours
     technologies: ["Python", "Pandas", "Plotly", "Dash", "SQL"],
@@ -79,7 +79,7 @@ const mockProjects: Project[] = [
     id: "3",
     title: "Mobile Fitness Tracker",
     description: "Develop a cross-platform mobile app using React Native. Track workouts, set goals, and visualize progress with charts and statistics.",
-    thumbnail: "/api/placeholder/400/300",
+    thumbnail: "/test.jpg",
     difficulty: "medium",
     estimatedTime: 2160, // 36 hours
     technologies: ["React Native", "Expo", "Firebase", "AsyncStorage", "Charts"],
@@ -103,7 +103,7 @@ const mockProjects: Project[] = [
     id: "4",
     title: "Design System & Component Library",
     description: "Create a comprehensive design system with reusable components, documentation, and style guide. Perfect for designers and frontend developers.",
-    thumbnail: "/api/placeholder/400/300",
+    thumbnail: "/test.jpg",
     difficulty: "easy",
     estimatedTime: 1200, // 20 hours
     technologies: ["Figma", "React", "Storybook", "CSS", "TypeScript"],
@@ -127,7 +127,7 @@ const mockProjects: Project[] = [
     id: "5",
     title: "DevOps CI/CD Pipeline",
     description: "Set up a complete CI/CD pipeline using Docker, Jenkins, and AWS. Deploy applications automatically with testing, security scanning, and monitoring.",
-    thumbnail: "/api/placeholder/400/300",
+    thumbnail: "/test.jpg",
     difficulty: "hard",
     estimatedTime: 2880, // 48 hours
     technologies: ["Docker", "Jenkins", "AWS", "Kubernetes", "Terraform"],
@@ -151,7 +151,7 @@ const mockProjects: Project[] = [
     id: "6",
     title: "Machine Learning Recommendation System",
     description: "Build a recommendation engine using collaborative filtering and content-based algorithms. Implement with Python, scikit-learn, and deploy with Flask.",
-    thumbnail: "/api/placeholder/400/300",
+    thumbnail: "/test.jpg",
     difficulty: "hard",
     estimatedTime: 3000, // 50 hours
     technologies: ["Python", "scikit-learn", "Pandas", "Flask", "NumPy"],
@@ -430,25 +430,25 @@ export default function ProjectsPage() {
             
             <Select
               label="Category"
-              selectedKeys={[selectedCategory]}
-              onSelectionChange={(keys) => setSelectedCategory(Array.from(keys)[0] as string)}
+              selectedKeys={new Set([selectedCategory])}
+               onSelectionChange={(keys) => setSelectedCategory(Array.from(keys)[0] as string)}
             >
               {categories.map((category) => (
-                <SelectItem key={category} value={category}>
-                  {category}
-                </SelectItem>
+                <SelectItem key={category}>
+                   {category}
+                 </SelectItem>
               ))}
             </Select>
             
             <Select
               label="Difficulty"
-              selectedKeys={[selectedDifficulty]}
-              onSelectionChange={(keys) => setSelectedDifficulty(Array.from(keys)[0] as string)}
+              selectedKeys={new Set([selectedDifficulty])}
+               onSelectionChange={(keys) => setSelectedDifficulty(Array.from(keys)[0] as string)}
             >
               {difficulties.map((difficulty) => (
-                <SelectItem key={difficulty} value={difficulty}>
-                  {difficulty === "All Levels" ? difficulty : difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
-                </SelectItem>
+                <SelectItem key={difficulty}>
+                   {difficulty === "All Levels" ? difficulty : difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
+                 </SelectItem>
               ))}
             </Select>
           </div>
@@ -460,16 +460,16 @@ export default function ProjectsPage() {
             
             <Select
               label="Sort by"
-              selectedKeys={[sortBy]}
+              selectedKeys={new Set([sortBy])}
               onSelectionChange={(keys) => setSortBy(Array.from(keys)[0] as string)}
               className="w-48"
             >
-              <SelectItem key="popular" value="popular">Most Popular</SelectItem>
-              <SelectItem key="newest" value="newest">Newest</SelectItem>
-              <SelectItem key="duration-short" value="duration-short">Shortest First</SelectItem>
-              <SelectItem key="duration-long" value="duration-long">Longest First</SelectItem>
-              <SelectItem key="difficulty-easy" value="difficulty-easy">Easiest First</SelectItem>
-              <SelectItem key="difficulty-hard" value="difficulty-hard">Hardest First</SelectItem>
+              <SelectItem key="popular">Most Popular</SelectItem>
+              <SelectItem key="newest">Newest</SelectItem>
+              <SelectItem key="duration-short">Shortest First</SelectItem>
+              <SelectItem key="duration-long">Longest First</SelectItem>
+              <SelectItem key="difficulty-easy">Easiest First</SelectItem>
+              <SelectItem key="difficulty-hard">Hardest First</SelectItem>
             </Select>
           </div>
         </div>

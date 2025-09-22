@@ -247,6 +247,69 @@ export function BottomNav({ isAuthenticated = false, className }: BottomNavProps
 
       {/* Spacer for bottom navigation */}
       <div className="h-16" />
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-t border-gray-200/50 dark:border-gray-800/50 lg:hidden">
+        <div className="px-4 py-3 safe-area-pb">
+          <div className="flex items-center justify-around max-w-md mx-auto">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const active = isActive(item.href);
+              
+              return (
+                <motion.div
+                  key={item.href}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                  className="flex-1"
+                >
+                  <Button
+                    as={Link}
+                    href={item.href}
+                    variant="light"
+                    className={cn(
+                      "h-12 w-full flex flex-col items-center justify-center gap-1 rounded-lg transition-all duration-200",
+                      "min-w-0 px-2",
+                      active
+                        ? "text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20"
+                        : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
+                    )}
+                  >
+                    <Icon className={cn(
+                      "h-5 w-5 flex-shrink-0 transition-transform duration-200",
+                      active && "scale-110"
+                    )} />
+                    <span className="text-xs font-medium truncate w-full text-center leading-tight">
+                      {item.label}
+                    </span>
+                  </Button>
+                </motion.div>
+              );
+            })}
+            
+            {/* Login Button for Unauthenticated Users */}
+            {!isAuthenticated && (
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                className="flex-1"
+              >
+                <Button
+                  as={Link}
+                  href="/auth"
+                  variant="light"
+                  className="h-12 w-full flex flex-col items-center justify-center gap-1 rounded-lg transition-all duration-200 min-w-0 px-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
+                >
+                  <User className="h-5 w-5 flex-shrink-0" />
+                  <span className="text-xs font-medium truncate w-full text-center leading-tight">
+                    Login
+                  </span>
+                </Button>
+              </motion.div>
+            )}
+          </div>
+        </div>
+      </div>
     </>
   );
 }

@@ -32,7 +32,7 @@ const mockTracks: Track[] = [
     id: "1",
     title: "Full-Stack Web Development",
     description: "Master both frontend and backend development with React, Node.js, and databases. Build complete web applications from scratch.",
-    thumbnail: "/api/placeholder/600/300",
+    thumbnail: "/test.jpg",
     courses: [],
     totalDuration: 2400, // 40 hours
     level: "intermediate",
@@ -45,7 +45,7 @@ const mockTracks: Track[] = [
     id: "2",
     title: "Data Science & Machine Learning",
     description: "Learn Python, statistics, machine learning algorithms, and data visualization. Work with real datasets and build predictive models.",
-    thumbnail: "/api/placeholder/600/300",
+    thumbnail: "/test.jpg",
     courses: [],
     totalDuration: 3600, // 60 hours
     level: "advanced",
@@ -58,7 +58,7 @@ const mockTracks: Track[] = [
     id: "3",
     title: "Mobile App Development",
     description: "Build native and cross-platform mobile apps using React Native and Flutter. Deploy to App Store and Google Play.",
-    thumbnail: "/api/placeholder/600/300",
+    thumbnail: "/test.jpg",
     courses: [],
     totalDuration: 2880, // 48 hours
     level: "intermediate",
@@ -71,7 +71,7 @@ const mockTracks: Track[] = [
     id: "4",
     title: "UI/UX Design Mastery",
     description: "Learn design principles, user research, prototyping, and design systems. Master Figma, Adobe XD, and design thinking.",
-    thumbnail: "/api/placeholder/600/300",
+    thumbnail: "/test.jpg",
     courses: [],
     totalDuration: 1800, // 30 hours
     level: "beginner",
@@ -84,7 +84,7 @@ const mockTracks: Track[] = [
     id: "5",
     title: "DevOps & Cloud Engineering",
     description: "Master Docker, Kubernetes, AWS, CI/CD pipelines, and infrastructure as code. Build scalable cloud applications.",
-    thumbnail: "/api/placeholder/600/300",
+    thumbnail: "/test.jpg",
     courses: [],
     totalDuration: 3000, // 50 hours
     level: "advanced",
@@ -97,7 +97,7 @@ const mockTracks: Track[] = [
     id: "6",
     title: "Cybersecurity Fundamentals",
     description: "Learn ethical hacking, network security, cryptography, and security best practices. Prepare for security certifications.",
-    thumbnail: "/api/placeholder/600/300",
+    thumbnail: "/test.jpg",
     courses: [],
     totalDuration: 2160, // 36 hours
     level: "intermediate",
@@ -317,14 +317,14 @@ export default function TracksPage() {
             
             <Select
               label="Category"
-              selectedKeys={[selectedCategory]}
+              selectedKeys={new Set([selectedCategory])}
               onSelectionChange={(keys) => setSelectedCategory(Array.from(keys)[0] as string)}
               classNames={{
                 trigger: "h-10",
               }}
             >
               {categories.map((category) => (
-                <SelectItem key={category} value={category}>
+                <SelectItem key={category}>
                   {category}
                 </SelectItem>
               ))}
@@ -332,16 +332,16 @@ export default function TracksPage() {
             
             <Select
               label="Level"
-              selectedKeys={[selectedLevel]}
+              selectedKeys={new Set([selectedLevel])}
               onSelectionChange={(keys) => setSelectedLevel(Array.from(keys)[0] as string)}
               classNames={{
                 trigger: "h-10",
               }}
             >
               {levels.map((level) => (
-                <SelectItem key={level} value={level}>
-                  {level.charAt(0).toUpperCase() + level.slice(1)}
-                </SelectItem>
+                <SelectItem key={level}>
+                                 {level.charAt(0).toUpperCase() + level.slice(1)}
+                               </SelectItem>
               ))}
             </Select>
           </div>
@@ -353,17 +353,17 @@ export default function TracksPage() {
             
             <Select
               label="Sort by"
-              selectedKeys={[sortBy]}
+              selectedKeys={new Set([sortBy])}
               onSelectionChange={(keys) => setSortBy(Array.from(keys)[0] as string)}
               className="w-full sm:w-48"
               classNames={{
                 trigger: "h-10",
               }}
             >
-              <SelectItem key="popular" value="popular">Most Popular</SelectItem>
-              <SelectItem key="newest" value="newest">Newest</SelectItem>
-              <SelectItem key="duration-short" value="duration-short">Shortest First</SelectItem>
-              <SelectItem key="duration-long" value="duration-long">Longest First</SelectItem>
+              <SelectItem key="popular">Most Popular</SelectItem>
+              <SelectItem key="newest">Newest</SelectItem>
+              <SelectItem key="duration-short">Shortest First</SelectItem>
+              <SelectItem key="duration-long">Longest First</SelectItem>
             </Select>
           </div>
         </div>

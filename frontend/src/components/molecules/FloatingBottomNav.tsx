@@ -156,11 +156,11 @@ export function FloatingBottomNav({
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 8, scale: 0.95 }}
         transition={{ duration: 0.15, ease: "easeOut" }}
-        className="absolute bottom-full mb-2 left-0 right-0 bg-white dark:bg-black border border-gray-200 dark:border-gray-800 rounded-2xl shadow-lg max-h-80 overflow-y-auto z-50"
+        className="absolute bottom-full mb-3 left-0 right-0 bg-white dark:bg-black border border-gray-200 dark:border-gray-800 rounded-2xl shadow-lg max-h-80 overflow-y-auto z-50"
       >
         <div className="p-4">
           {isSearching ? (
-            <div className="space-y-2">
+            <div className="space-y-3">
               {[1, 2, 3].map((i) => (
                 <div key={i} className="animate-pulse">
                   <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-3/4 mb-2"></div>
@@ -169,18 +169,18 @@ export function FloatingBottomNav({
               ))}
             </div>
           ) : searchResults.length > 0 ? (
-            <div className="space-y-1">
-              <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
+            <div className="space-y-2">
+              <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-3">
                 Search Results
               </div>
               {searchResults.map((result) => (
                 <Link
                   key={result.id}
                   href={result.url}
-                  className="block p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors"
+                  className="block p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors"
                   onClick={() => setShowSearchDropUp(false)}
                 >
-                  <div className="font-medium text-sm">{result.title}</div>
+                  <div className="font-medium text-sm mb-1">{result.title}</div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 capitalize">
                     {result.type}
                   </div>
@@ -188,11 +188,11 @@ export function FloatingBottomNav({
               ))}
             </div>
           ) : searchQuery ? (
-            <div className="text-center py-4 text-gray-500 dark:text-gray-400 text-sm">
+            <div className="text-center py-6 text-gray-500 dark:text-gray-400 text-sm">
               No results found for &quot;{searchQuery}&quot;
             </div>
           ) : (
-            <div className="text-center py-4 text-gray-500 dark:text-gray-400 text-sm">
+            <div className="text-center py-6 text-gray-500 dark:text-gray-400 text-sm">
               Start typing to search courses, tracks, and projects...
             </div>
           )}
@@ -212,23 +212,23 @@ export function FloatingBottomNav({
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 8, scale: 0.95 }}
         transition={{ duration: 0.15, ease: "easeOut" }}
-        className="absolute bottom-full mb-2 right-0 bg-white dark:bg-black border border-gray-200 dark:border-gray-800 rounded-2xl shadow-lg min-w-48 z-50"
+        className="absolute bottom-full mb-3 right-0 bg-white dark:bg-black border border-gray-200 dark:border-gray-800 rounded-2xl shadow-lg min-w-52 z-50"
         style={{
           position: "fixed",
-          bottom: "calc(100vh - 120px)", // Adjust based on nav height
-          right: "20px",
+          bottom: "calc(100vh - 110px)", // Improved positioning to prevent overlap
+          right: "24px",
         }}
       >
-        <div className="p-2">
+        <div className="p-3">
           {isAuthenticated && user ? (
             <>
-              <div className="px-3 py-2 border-b border-gray-200 dark:border-gray-800">
-                <div className="font-medium text-sm">{user.name}</div>
+              <div className="px-3 py-3 border-b border-gray-200 dark:border-gray-800 mb-2">
+                <div className="font-medium text-sm mb-1">{user.name}</div>
                 <div className="text-xs text-gray-500 dark:text-gray-400">{user.email}</div>
               </div>
               <Link
                 href="/profile"
-                className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors text-sm"
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors text-sm"
                 onClick={() => setShowProfileDropUp(false)}
               >
                 <User className="h-4 w-4" />
@@ -236,7 +236,7 @@ export function FloatingBottomNav({
               </Link>
               <Link
                 href="/settings"
-                className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors text-sm"
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors text-sm"
                 onClick={() => setShowProfileDropUp(false)}
               >
                 <Settings className="h-4 w-4" />
@@ -244,7 +244,7 @@ export function FloatingBottomNav({
               </Link>
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors text-sm w-full text-left"
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors text-sm w-full text-left mt-1"
               >
                 <LogOut className="h-4 w-4" />
                 Logout
@@ -253,7 +253,7 @@ export function FloatingBottomNav({
           ) : (
             <Link
               href="/auth"
-              className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors text-sm"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors text-sm"
               onClick={() => setShowProfileDropUp(false)}
             >
               <LogIn className="h-4 w-4" />

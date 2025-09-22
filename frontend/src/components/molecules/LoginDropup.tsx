@@ -231,6 +231,12 @@ export function LoginDropup({ isVisible, onClose, className }: LoginDropupProps)
               startContent={<User className="h-4 w-4 text-gray-400" />}
               variant="bordered"
               isRequired
+              classNames={{
+                input: "text-sm pl-2",
+                inputWrapper: "h-12 px-3",
+                label: "text-sm font-medium",
+                mainWrapper: "h-auto",
+              }}
             />
           )}
           
@@ -243,6 +249,12 @@ export function LoginDropup({ isVisible, onClose, className }: LoginDropupProps)
             startContent={<Mail className="h-4 w-4 text-gray-400" />}
             variant="bordered"
             isRequired
+            classNames={{
+              input: "text-sm pl-2",
+              inputWrapper: "h-12 px-3",
+              label: "text-sm font-medium",
+              mainWrapper: "h-auto",
+            }}
           />
           
           <Input
@@ -267,6 +279,12 @@ export function LoginDropup({ isVisible, onClose, className }: LoginDropupProps)
             }
             variant="bordered"
             isRequired
+            classNames={{
+              input: "text-sm pl-2 pr-2",
+              inputWrapper: "h-12 px-3",
+              label: "text-sm font-medium",
+              mainWrapper: "h-auto",
+            }}
           />
           
           {activeTab === "register" && (
@@ -280,6 +298,12 @@ export function LoginDropup({ isVisible, onClose, className }: LoginDropupProps)
                 startContent={<Lock className="h-4 w-4 text-gray-400" />}
                 variant="bordered"
                 isRequired
+                classNames={{
+                  input: "text-sm pl-2 pr-2",
+                  inputWrapper: "h-12 px-3",
+                  label: "text-sm font-medium",
+                  mainWrapper: "h-auto",
+                }}
               />
               
               <Checkbox

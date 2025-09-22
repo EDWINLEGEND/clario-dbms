@@ -52,7 +52,8 @@ export function calculateProgress(completed: number, total: number): number {
   return Math.round((completed / total) * 100);
 }
 
-export function debounce<T extends (...args: unknown[]) => unknown>(
+// Use any[] for function args to allow narrower parameter types at call sites
+export function debounce<T extends (...args: any[]) => any>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {

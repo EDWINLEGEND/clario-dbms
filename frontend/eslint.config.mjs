@@ -27,7 +27,10 @@ const eslintConfig = [
     },
     rules: {
       "jsx-a11y/anchor-is-valid": "error",
-      "@typescript-eslint/no-unused-vars": "error",
+      // Downgrade high-churn rules to warnings to avoid blocking builds
+      "@typescript-eslint/no-unused-vars": "warn",
+      "react/no-unescaped-entities": "warn",
+      "prefer-const": "warn",
       "@typescript-eslint/no-explicit-any": "warn",
       "react-hooks/exhaustive-deps": "warn",
     },

@@ -3,7 +3,7 @@
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Button } from "@heroui/react";
-import { Sun, Moon, Monitor } from "lucide-react";
+import { Sun, Moon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -36,26 +36,21 @@ export function ThemeToggle({
         className={cn("animate-pulse", className)}
         disabled
       >
-        <Monitor className="h-4 w-4" />
+        <Sun className="h-4 w-4" />
         {showLabel && <span className="ml-2">Theme</span>}
       </Button>
     );
   }
 
   const cycleTheme = () => {
-    if (theme === "light") {
+    if (theme === "light" || resolvedTheme === "light") {
       setTheme("dark");
-    } else if (theme === "dark") {
-      setTheme("system");
     } else {
       setTheme("light");
     }
   };
 
   const getIcon = () => {
-    if (theme === "system") {
-      return <Monitor className="h-4 w-4" />;
-    }
     return resolvedTheme === "dark" ? (
       <Moon className="h-4 w-4" />
     ) : (
@@ -64,7 +59,6 @@ export function ThemeToggle({
   };
 
   const getLabel = () => {
-    if (theme === "system") return "System";
     return resolvedTheme === "dark" ? "Dark" : "Light";
   };
 
@@ -81,22 +75,22 @@ export function ThemeToggle({
         className
       )}
       onPress={cycleTheme}
-      aria-label={`Switch to ${theme === "light" ? "dark" : theme === "dark" ? "system" : "light"} theme`}
+      aria-label={`Switch to ${resolvedTheme === "light" ? "dark" : "light"} theme`}
     >
       <AnimatePresence mode="wait">
         <motion.div
-          key={theme + resolvedTheme}
+          key={`${theme ?? "system"}-${resolvedTheme ?? ""}`}
           initial={{ scale: 0.5, opacity: 0, rotate: -180 }}
-          animate={{ scale: 1, opacity: 1, rotate: 0 }}
-          exit={{ scale: 0.5, opacity: 0, rotate: 180 }}
-          transition={{ 
-            duration: 0.3, 
-            ease: "easeInOut",
-            type: "spring",
-            stiffness: 200,
-            damping: 20
-          }}
-          className="flex items-center justify-center"
+           animate={{ scale: 1, opacity: 1, rotate: 0 }}
+           exit={{ scale: 0.5, opacity: 0, rotate: 180 }}
+           transition={{ 
+             duration: 0.3, 
+             ease: "easeInOut",
+             type: "spring",
+             stiffness: 200,
+             damping: 20
+           }}
+           className="flex items-center justify-center"
         >
           {getIcon()}
         </motion.div>

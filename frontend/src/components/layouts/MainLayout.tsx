@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
-import { Header } from "@/components/molecules/Header";
+import { ModernNavbar } from "@/components/molecules/ModernNavbar";
 import { BottomNav } from "@/components/molecules/BottomNav";
 import { User } from "@/types";
 import { cn } from "@/lib/utils";
@@ -26,7 +26,7 @@ export function MainLayout({
       {/* Header - hidden on mobile when bottom nav is shown */}
       {showHeader && (
         <div className={cn(showBottomNav && "hidden sm:block")}>
-          <Header user={user} />
+          <ModernNavbar user={user} />
         </div>
       )}
 

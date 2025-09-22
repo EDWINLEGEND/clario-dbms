@@ -1,0 +1,113 @@
+
+
+
+          
+
+        
+            
+toolName: view_files
+            
+status: success
+          
+            
+filePath: C:/Users/hp/Documents/GitHub/clario-dbms/frontend/src/components/molecules/BottomNav.tsx
+          
+
+        
+            
+toolName: view_files
+            
+status: success
+          
+            
+filePath: C:/Users/hp/Documents/GitHub/clario-dbms/frontend/THEME_GUIDE.md
+          
+
+        
+            
+toolName: view_files
+            
+status: success
+          
+            
+filePath: C:/Users/hp/Documents/GitHub/clario-dbms/frontend/tailwind.config.ts
+          
+
+        
+            
+toolName: view_files
+            
+status: success
+          
+            
+filePath: C:/Users/hp/Documents/GitHub/clario-dbms/frontend/src/app/dashboard/page.tsx
+          
+
+        
+            
+toolName: search_codebase
+            
+status: success
+          
+query: UI components and design system usage, including HeroUI components, Framer Motion animations, and design patterns
+          
+Based on my analysis of the codebase, the CLARIO application is following a **modern, comprehensive design system** with several key UI style characteristics:
+
+## **Primary UI Framework & Design System**
+
+### **Component Library**
+- **HeroUI (NextUI)** - Primary component library providing Cards, Buttons, Inputs, Tabs, Avatars, etc.
+- **Framer Motion** - Extensive animation system with smooth transitions, hover effects, and page transitions
+- **Tailwind CSS** - Utility-first CSS framework for styling
+
+### **Design Philosophy**
+- **Two-tone theming**: Strict light (white background, black text) and dark (black background, white text) modes
+- **App Shell Architecture**: Non-scrollable homepage with floating bottom navigation
+- **Mobile-first responsive design** with adaptive layouts
+
+## **Key UI Style Elements**
+
+### **Visual Design**
+- **Glassmorphism effects**: `bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl` for floating elements
+- **Subtle shadows and borders**: `border-t border-gray-200/50 dark:border-gray-800/50`
+- **Smooth transitions**: All theme changes and interactions include `cubic-bezier(0.4, 0, 0.2, 1)` transitions
+- **Consistent spacing scale**: Using design tokens for spacing, typography, and colors
+
+### **Typography**
+- **Manrope** font for headings (700 weight)
+- **Fira Sans** for body text (300-700 weights)
+- Semantic font size scale from xs to 4xl
+
+### **Color System**
+- **Primary**: Blue/Indigo palette (50-950)
+- **Secondary**: Teal palette (50-950)
+- **Semantic colors** with CSS custom properties for light/dark themes
+- **WCAG AA compliant** color contrast ratios
+
+### **Animation & Interactions**
+- **Micro-interactions**: Scale transforms on hover/tap (`whileHover={{ scale: 1.05 }}`)
+- **Stagger animations**: Sequential reveal of content elements
+- **Page transitions**: Fade/slide animations between routes
+- **Spring physics**: `type: "spring", stiffness: 400, damping: 17` for natural feel
+
+### **Navigation Pattern**
+- **Floating bottom navigation** for mobile (primary navigation method)
+- **Drop-up menus** that open upward from the bottom nav
+- **Portal-based overlays** to prevent clipping issues
+
+### **Component Patterns**
+- **Card-based layouts** with consistent padding and shadows
+- **Badge/chip system** for categories and status indicators
+- **Progress indicators** (linear and circular)
+- **Avatar system** with fallback initials
+- **Consistent button variants** with icon support
+
+## **Accessibility & UX**
+- **Keyboard navigation** support throughout
+- **Focus management** with visible focus rings
+- **Screen reader support** with proper ARIA labels
+- **Safe area handling** for mobile devices
+- **Theme persistence** in localStorage with system preference detection
+
+This represents a **premium, modern web application UI** that prioritizes user experience, accessibility, and visual polish while maintaining consistency across all components and interactions.
+        

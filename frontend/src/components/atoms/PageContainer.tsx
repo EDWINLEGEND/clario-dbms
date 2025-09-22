@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, type HTMLMotionProps } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
 
@@ -10,12 +10,7 @@ interface PageContainerProps {
   maxWidth?: "sm" | "md" | "lg" | "xl" | "2xl" | "full";
   padding?: "none" | "sm" | "md" | "lg" | "xl";
   enableMotion?: boolean;
-  motionProps?: {
-    initial?: object;
-    animate?: object;
-    exit?: object;
-    transition?: object;
-  };
+  motionProps?: HTMLMotionProps<"div">;
 }
 
 const maxWidthClasses = {
@@ -35,7 +30,7 @@ const paddingClasses = {
   xl: "p-12"
 };
 
-const defaultMotionProps = {
+const defaultMotionProps: HTMLMotionProps<"div"> = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
   exit: { opacity: 0, y: -20 },

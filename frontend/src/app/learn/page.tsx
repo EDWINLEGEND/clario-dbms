@@ -15,7 +15,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { PageContainer } from "@/components/layouts/AppShell";
 import { CourseCard } from "@/components/molecules/CourseCard";
 import { CustomButton } from "@/components/atoms/CustomButton";
-import { PageTransition, staggerContainer, staggerItem, hoverScale } from "@/components/atoms/PageTransition";
+import { PageTransition, staggerContainer, staggerItem, hoverScale, tapScale } from "@/components/atoms/PageTransition";
 import { Course, SearchFilters } from "@/types";
 import { cn, debounce } from "@/lib/utils";
 
@@ -25,7 +25,7 @@ const mockCourses: Course[] = [
     id: "1",
     title: "React Fundamentals",
     description: "Learn the basics of React including components, state, and props. Perfect for beginners starting their React journey.",
-    thumbnail: "/api/placeholder/400/225",
+    thumbnail: "/test.jpg",
     instructor: {
       id: "1",
       name: "Sarah Johnson",
@@ -51,7 +51,7 @@ const mockCourses: Course[] = [
     id: "2",
     title: "Advanced TypeScript",
     description: "Master advanced TypeScript concepts and patterns for building robust applications.",
-    thumbnail: "/api/placeholder/400/225",
+    thumbnail: "/test.jpg",
     instructor: {
       id: "2",
       name: "Mike Chen",
@@ -77,7 +77,7 @@ const mockCourses: Course[] = [
     id: "3",
     title: "UI/UX Design Principles",
     description: "Learn the fundamentals of user interface and experience design with practical examples.",
-    thumbnail: "/api/placeholder/400/225",
+    thumbnail: "/test.jpg",
     instructor: {
       id: "3",
       name: "Emma Davis",
@@ -103,7 +103,7 @@ const mockCourses: Course[] = [
     id: "4",
     title: "Node.js Backend Development",
     description: "Build scalable backend applications with Node.js, Express, and MongoDB.",
-    thumbnail: "/api/placeholder/400/225",
+    thumbnail: "/test.jpg",
     instructor: {
       id: "4",
       name: "Alex Rodriguez",
@@ -129,7 +129,7 @@ const mockCourses: Course[] = [
     id: "5",
     title: "Python for Data Science",
     description: "Learn Python programming for data analysis, visualization, and machine learning.",
-    thumbnail: "/api/placeholder/400/225",
+    thumbnail: "/test.jpg",
     instructor: {
       id: "5",
       name: "Dr. Lisa Wang",
@@ -155,7 +155,7 @@ const mockCourses: Course[] = [
     id: "6",
     title: "Mobile App Development with React Native",
     description: "Build cross-platform mobile applications using React Native and Expo.",
-    thumbnail: "/api/placeholder/400/225",
+    thumbnail: "/test.jpg",
     instructor: {
       id: "6",
       name: "James Wilson",
@@ -234,11 +234,12 @@ export default function LearnPage() {
 
   // Filter and sort courses
   const filteredCourses = useMemo(() => {
+    const query = (filters.query ?? "").toLowerCase();
     let filtered = mockCourses.filter(course => {
-      const matchesQuery = !filters.query || 
-        course.title.toLowerCase().includes(filters.query.toLowerCase()) ||
-        course.description.toLowerCase().includes(filters.query.toLowerCase()) ||
-        course.tags.some(tag => tag.toLowerCase().includes(filters.query.toLowerCase()));
+      const matchesQuery = query.length === 0 || 
+        course.title.toLowerCase().includes(query) ||
+        course.description.toLowerCase().includes(query) ||
+        course.tags.some(tag => tag.toLowerCase().includes(query));
       
       const matchesCategory = filters.category === "All Categories" || 
         course.category === filters.category;
@@ -317,7 +318,7 @@ export default function LearnPage() {
             <div className="md:col-span-2">
               <Input
                 placeholder="Search courses, topics, or instructors..."
-                value={filters.query}
+                value={filters.query ?? ""}
                 onChange={(e) => handleFilterChange("query", e.target.value)}
                 startContent={<Search className="h-4 w-4 text-gray-400" />}
                 classNames={{
@@ -328,35 +329,39 @@ export default function LearnPage() {
             </div>
             <Select
               placeholder="Category"
-              selectedKeys={[filters.category]}
+              selectedKeys={new Set([filters.category ?? "All Categories"])}
               onSelectionChange={(keys) => {
                 const category = Array.from(keys)[0] as string;
                 handleFilterChange("category", category);
               }}
               classNames={{
-                trigger: "h-10",
+                trigger: "h-10 min-w-[140px]",
+                value: "text-sm",
+                selectorIcon: "text-gray-400",
               }}
             >
               {categories.map((category) => (
-                <SelectItem key={category} value={category}>
-                  {category}
-                </SelectItem>
-              ))}
+                    <SelectItem key={category}>
+                      {category}
+                    </SelectItem>
+               ))}
             </Select>
             <Select
               placeholder="Level"
-              selectedKeys={[filters.level]}
+              selectedKeys={new Set([filters.level ?? "All Levels"])}
               onSelectionChange={(keys) => {
                 const level = Array.from(keys)[0] as string;
                 handleFilterChange("level", level);
               }}
               classNames={{
-                trigger: "h-10",
+                trigger: "h-10 min-w-[120px]",
+                value: "text-sm",
+                selectorIcon: "text-gray-400",
               }}
             >
               {levels.map((level) => (
-                <SelectItem key={level} value={level}>
-                  {level.charAt(0).toUpperCase() + level.slice(1)}
+                <SelectItem key={level}>
+                  { level.charAt(0).toUpperCase() + level.slice(1) }
                 </SelectItem>
               ))}
             </Select>
@@ -377,13 +382,13 @@ export default function LearnPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <Select
                   label="Category"
-                  selectedKeys={[filters.category!]}
+                  selectedKeys={new Set([filters.category ?? "All Categories"])}
                   onSelectionChange={(keys) => 
                     handleFilterChange("category", Array.from(keys)[0])
                   }
                 >
                   {categories.map((category) => (
-                    <SelectItem key={category} value={category}>
+                    <SelectItem key={category}>
                       {category}
                     </SelectItem>
                   ))}
@@ -391,13 +396,13 @@ export default function LearnPage() {
 
                 <Select
                   label="Level"
-                  selectedKeys={[filters.level!]}
+                  selectedKeys={new Set([filters.level ?? "All Levels"])}
                   onSelectionChange={(keys) => 
                     handleFilterChange("level", Array.from(keys)[0])
                   }
                 >
                   {levels.map((level) => (
-                    <SelectItem key={level} value={level}>
+                    <SelectItem key={level}>
                       {level.charAt(0).toUpperCase() + level.slice(1)}
                     </SelectItem>
                   ))}
@@ -405,14 +410,14 @@ export default function LearnPage() {
 
                 <Select
                   label="Sort By"
-                  selectedKeys={[sortBy]}
+                  selectedKeys={new Set([sortBy])}
                   onSelectionChange={(keys) => setSortBy(Array.from(keys)[0] as string)}
                 >
-                  <SelectItem key="popular" value="popular">Most Popular</SelectItem>
-                  <SelectItem key="rating" value="rating">Highest Rated</SelectItem>
-                  <SelectItem key="newest" value="newest">Newest</SelectItem>
-                  <SelectItem key="price-low" value="price-low">Price: Low to High</SelectItem>
-                  <SelectItem key="price-high" value="price-high">Price: High to Low</SelectItem>
+                  <SelectItem key="popular">Most Popular</SelectItem>
+                  <SelectItem key="rating">Highest Rated</SelectItem>
+                  <SelectItem key="newest">Newest</SelectItem>
+                  <SelectItem key="price-low">Price: Low to High</SelectItem>
+                  <SelectItem key="price-high">Price: High to Low</SelectItem>
                 </Select>
 
                 <div className="flex gap-2">
@@ -454,8 +459,8 @@ export default function LearnPage() {
                     step={0.5}
                     minValue={0}
                     maxValue={5}
-                    value={[filters.rating!]}
-                    onChange={(value) => handleFilterChange("rating", value[0])}
+                    value={filters.rating!}
+                    onChange={(value) => handleFilterChange("rating", Array.isArray(value) ? value[0] : value)}
                     className="max-w-md"
                   />
                   <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -555,8 +560,8 @@ export default function LearnPage() {
                       key={course.id}
                       variants={staggerItem}
                       custom={index}
-                      whileHover={hoverScale.whileHover}
-                      whileTap={hoverScale.whileTap}
+                      whileHover={hoverScale}
+                      whileTap={tapScale}
                     >
                       <CourseCard
                         course={course}

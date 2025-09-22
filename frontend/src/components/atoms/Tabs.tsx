@@ -241,9 +241,9 @@ export function Tabs({
           ) : (
             <motion.div
               key={activeTab}
-              initial={animated ? { opacity: 0, y: 10 } : false}
-              animate={animated ? { opacity: 1, y: 0 } : false}
-              exit={animated ? { opacity: 0, y: -10 } : false}
+              initial={animated ? { opacity: 0, y: 10 } : undefined}
+              animate={animated ? { opacity: 1, y: 0 } : undefined}
+              exit={animated ? { opacity: 0, y: -10 } : undefined}
               transition={{ duration: 0.2, ease: "easeInOut" }}
               className="w-full"
             >

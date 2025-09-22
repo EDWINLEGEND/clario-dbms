@@ -346,7 +346,7 @@ export function DrawerModal({
   ...props
 }: {
   placement?: "left" | "right" | "top" | "bottom";
-} & Omit<ModalProps, 'motionPreset' | 'size'>) {
+} & Omit<ModalProps, 'motionPreset' | 'size' | 'placement'>) {
   const motionVariants = {
     left: {
       initial: { x: "-100%" },
