@@ -2,18 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Progress,
-  Button,
-  Chip,
-  Avatar,
-  Tabs,
-  Tab,
-} from "@heroui/react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, Variants } from "framer-motion";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   BookOpen,
   Clock,
@@ -27,624 +21,426 @@ import {
   Flame,
   Users,
   Star,
+  Trophy,
+  Zap,
+  Brain,
+  Code,
+  Sparkles
 } from "lucide-react";
-import { PageContainer } from "@/components/layouts/AppShell";
-import { CustomButton } from "@/components/atoms/CustomButton";
-import { ProgressBar, CircularProgress } from "@/components/atoms/ProgressBar";
-import { CustomAvatar } from "@/components/atoms/CustomAvatar";
-import { CourseCard } from "@/components/molecules/CourseCard";
-import { PageTransition, staggerContainer, staggerItem, hoverScale, tapScale } from "@/components/atoms/PageTransition";
-import { User, Course, Progress as ProgressType } from "@/types";
-import { cn, formatDuration, calculateProgress } from "@/lib/utils";
+import { StatCard } from "@/components/cards/StatCard";
+import { AchievementBadge } from "@/components/cards/AchievementBadge";
 
 // Mock user data
-const mockUser: User = {
+const mockUser = {
   id: "1",
   name: "Alex Johnson",
   email: "alex@example.com",
   avatar: undefined,
-  role: "student",
-  bio: "Full-stack developer passionate about learning new technologies",
-  badges: [
-    {
-      id: "1",
-      name: "First Course",
-      description: "Completed your first course",
-      icon: "🎓",
-      color: "primary",
-      earnedAt: new Date(),
-    },
-    {
-      id: "2",
-      name: "Week Streak",
-      description: "7 days learning streak",
-      icon: "🔥",
-      color: "warning",
-      earnedAt: new Date(),
-    },
-  ],
-  createdAt: new Date(),
-  updatedAt: new Date(),
+  streak: 14,
+  level: 5,
+  xp: 2450,
+  nextLevelXp: 3000,
 };
 
-// Mock progress data
-const mockProgress: ProgressType[] = [
-  {
-    userId: "1",
-    courseId: "1",
-    completedLessons: ["1", "2", "3"],
-    currentLesson: "4",
-    progressPercentage: 60,
-    timeSpent: 180,
-    lastAccessed: new Date(),
-  },
-  {
-    userId: "1",
-    courseId: "2",
-    completedLessons: ["1", "2"],
-    currentLesson: "3",
-    progressPercentage: 25,
-    timeSpent: 120,
-    lastAccessed: new Date(Date.now() - 86400000), // 1 day ago
-  },
-];
-
-// Mock courses
-const mockCourses: Course[] = [
+// Mock courses in progress
+const coursesInProgress = [
   {
     id: "1",
     title: "React Fundamentals",
-    description: "Learn the basics of React",
+    instructor: "Sarah Johnson",
     thumbnail: "/test.jpg",
-    instructor: {
-      id: "1",
-      name: "Sarah Johnson",
-      email: "sarah@example.com",
-      role: "instructor",
-      badges: [],
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-    duration: 300,
-    level: "beginner",
-    category: "Web Development",
-    tags: ["React", "JavaScript"],
-    lessons: [],
-    enrollmentCount: 1250,
-    rating: 4.8,
-    price: 0,
-    isPublished: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    progress: 75,
+    timeSpent: 180,
+    totalDuration: 300,
+    nextLesson: "State Management",
   },
   {
     id: "2",
     title: "Advanced TypeScript",
-    description: "Master TypeScript concepts",
+    instructor: "Mike Chen",
     thumbnail: "/test.jpg",
-    instructor: {
-      id: "2",
-      name: "Mike Chen",
-      email: "mike@example.com",
-      role: "instructor",
-      badges: [],
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-    duration: 480,
-    level: "advanced",
-    category: "Programming",
-    tags: ["TypeScript", "JavaScript"],
-    lessons: [],
-    enrollmentCount: 890,
-    rating: 4.9,
-    price: 49,
-    isPublished: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    progress: 40,
+    timeSpent: 120,
+    totalDuration: 480,
+    nextLesson: "Generic Types",
   },
-];
-
-// Mock recommended courses
-const recommendedCourses: Course[] = [
   {
     id: "3",
-    title: "Node.js Backend Development",
-    description: "Build scalable backend applications",
+    title: "Node.js Backend",
+    instructor: "Emma Davis",
     thumbnail: "/test.jpg",
-    instructor: {
-      id: "3",
-      name: "Emma Davis",
-      email: "emma@example.com",
-      role: "instructor",
-      badges: [],
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-    duration: 360,
-    level: "intermediate",
-    category: "Backend Development",
-    tags: ["Node.js", "Express"],
-    lessons: [],
-    enrollmentCount: 756,
-    rating: 4.6,
-    price: 59,
-    isPublished: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    progress: 20,
+    timeSpent: 60,
+    totalDuration: 360,
+    nextLesson: "Express Routing",
   },
 ];
 
-interface StatCardProps {
-  title: string;
-  value: string | number;
-  icon: React.ComponentType<{ className?: string }>;
-  color?: "primary" | "secondary" | "success" | "warning" | "danger";
-  trend?: {
-    value: number;
-    isPositive: boolean;
-  };
-}
+// Mock achievements
+const achievements = [
+  {
+    id: "1",
+    name: "First Steps",
+    description: "Complete your first lesson",
+    icon: "🎯",
+    isUnlocked: true,
+    unlockedAt: new Date(Date.now() - 86400000 * 10),
+    rarity: "common" as const,
+  },
+  {
+    id: "2",
+    name: "Week Warrior",
+    description: "Maintain a 7-day learning streak",
+    icon: "🔥",
+    isUnlocked: true,
+    unlockedAt: new Date(Date.now() - 86400000 * 3),
+    rarity: "rare" as const,
+  },
+  {
+    id: "3",
+    name: "Course Crusher",
+    description: "Complete your first course",
+    icon: "🏆",
+    isUnlocked: true,
+    unlockedAt: new Date(Date.now() - 86400000 * 5),
+    rarity: "epic" as const,
+  },
+  {
+    id: "4",
+    name: "Speed Demon",
+    description: "Complete 5 lessons in one day",
+    icon: "⚡",
+    isUnlocked: false,
+    progress: { current: 3, total: 5 },
+    rarity: "rare" as const,
+  },
+  {
+    id: "5",
+    name: "Master Learner",
+    description: "Complete 10 courses",
+    icon: "🎓",
+    isUnlocked: false,
+    progress: { current: 1, total: 10 },
+    rarity: "legendary" as const,
+  },
+  {
+    id: "6",
+    name: "Consistency King",
+    description: "Maintain a 30-day streak",
+    icon: "👑",
+    isUnlocked: false,
+    progress: { current: 14, total: 30 },
+    rarity: "legendary" as const,
+  },
+];
 
-function StatCard({ title, value, icon: Icon, color = "primary", trend }: StatCardProps) {
-  const colorClasses = {
-    primary: "bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400",
-    secondary: "bg-secondary-100 dark:bg-secondary-900 text-secondary-600 dark:text-secondary-400",
-    success: "bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400",
-    warning: "bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-400",
-    danger: "bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400",
-  };
+// Animation variants
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
 
-  return (
-    <motion.div
-      variants={staggerItem}
-      whileHover={hoverScale}
-      whileTap={tapScale}
-    >
-      <Card>
-        <CardBody className="flex flex-row items-center gap-4">
-          <div className={cn("p-3 rounded-lg", colorClasses[color])}>
-            <Icon className="h-6 w-6" />
-          </div>
-          <div className="flex-1">
-            <p className="text-sm text-muted-foreground">{title}</p>
-            <div className="flex items-center gap-2">
-              <p className="text-2xl font-bold">{value}</p>
-              {trend && (
-                <div className={cn(
-                  "flex items-center gap-1 text-xs",
-                  trend.isPositive ? "text-green-600" : "text-red-600"
-                )}>
-                  <TrendingUp className={cn(
-                    "h-3 w-3",
-                    !trend.isPositive && "rotate-180"
-                  )} />
-                  <span>{Math.abs(trend.value)}%</span>
-                </div>
-              )}
-            </div>
-          </div>
-        </CardBody>
-      </Card>
-    </motion.div>
-  );
-}
-
-interface ActivityItemProps {
-  type: "course_completed" | "lesson_completed" | "badge_earned" | "streak_milestone";
-  title: string;
-  description: string;
-  timestamp: Date;
-  icon?: React.ComponentType<{ className?: string }>;
-}
-
-function ActivityItem({ type, title, description, timestamp, icon: Icon }: ActivityItemProps) {
-  const typeConfig = {
-    course_completed: { color: "success", defaultIcon: CheckCircle },
-    lesson_completed: { color: "primary", defaultIcon: Play },
-    badge_earned: { color: "warning", defaultIcon: Award },
-    streak_milestone: { color: "danger", defaultIcon: Flame },
-  };
-
-  const config = typeConfig[type];
-  const IconComponent = Icon || config.defaultIcon;
-
-  return (
-    <motion.div
-      variants={staggerItem}
-      whileHover={hoverScale}
-      className="flex items-start gap-2 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-    >
-      <div className={cn(
-        "p-1.5 rounded-full flex-shrink-0",
-        config.color === "success" && "bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400",
-        config.color === "primary" && "bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400",
-        config.color === "warning" && "bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-400",
-        config.color === "danger" && "bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400"
-      )}>
-        <IconComponent className="h-3 w-3" />
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="font-medium text-xs">{title}</p>
-        <p className="text-xs text-muted-foreground">{description}</p>
-        <p className="text-xs text-muted-foreground mt-0.5">
-          {timestamp.toLocaleDateString()}
-        </p>
-      </div>
-    </motion.div>
-  );
-}
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring" as const,
+      stiffness: 300,
+      damping: 30,
+    },
+  },
+};
 
 export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState("overview");
-  
-  // Calculate stats
-  const totalCoursesEnrolled = mockProgress.length;
-  const completedCourses = mockProgress.filter(p => p.progressPercentage === 100).length;
-  const totalTimeSpent = mockProgress.reduce((acc, p) => acc + p.timeSpent, 0);
-  const averageProgress = mockProgress.reduce((acc, p) => acc + p.progressPercentage, 0) / mockProgress.length;
-  const currentStreak = 7; // Mock streak data
+  const [selectedTab, setSelectedTab] = useState("overview");
 
-  // Mock recent activity
-  const recentActivity: ActivityItemProps[] = [
-    {
-      type: "lesson_completed",
-      title: "Completed: React Components",
-      description: "React Fundamentals Course",
-      timestamp: new Date(),
-    },
-    {
-      type: "badge_earned",
-      title: "Earned: Week Streak Badge",
-      description: "7 days of continuous learning",
-      timestamp: new Date(Date.now() - 86400000),
-    },
-    {
-      type: "course_completed",
-      title: "Completed: JavaScript Basics",
-      description: "Finished all lessons and quizzes",
-      timestamp: new Date(Date.now() - 172800000),
-    },
-  ];
+  // Calculate stats
+  const totalCoursesEnrolled = coursesInProgress.length;
+  const completedCourses = 1; // Mock data
+  const totalTimeSpent = coursesInProgress.reduce((acc, course) => acc + course.timeSpent, 0);
+  const averageProgress = coursesInProgress.reduce((acc, course) => acc + course.progress, 0) / coursesInProgress.length;
+  const unlockedAchievements = achievements.filter(a => a.isUnlocked).length;
 
   return (
-    <PageTransition>
-      <PageContainer className="h-full">
-        <div className="h-full flex flex-col">
-          {/* Welcome Section - Fixed */}
-          <motion.div 
-            className="flex-shrink-0 mb-6"
-            variants={staggerItem}
-          >
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-              <div>
-                <h1 className="font-manrope text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">
-                  Welcome back, {mockUser.name.split(' ')[0]}! 👋
-                </h1>
-                <p className="text-gray-600 dark:text-gray-300 mt-2">
-                  Ready to continue your learning journey?
-                </p>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="text-right">
-                  <p className="text-sm text-muted-foreground">Current Streak</p>
-                  <div className="flex items-center gap-2">
-                    <Flame className="h-5 w-5 text-orange-500" />
-                    <span className="font-bold text-lg">{currentStreak} days</span>
-                  </div>
-                </div>
-                <CustomButton
-                  color="primary"
-                  variant="flat"
-                  leftIcon={Calendar}
-                  size="sm"
-                >
-                  Schedule
-                </CustomButton>
-                <CustomButton
-                  color="primary"
-                  leftIcon={Target}
-                  size="sm"
-                >
-                  Set Goals
-                </CustomButton>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Stats Grid - Fixed */}
-          <motion.div 
-            className="flex-shrink-0 mb-6"
-            variants={staggerContainer}
-            initial="hidden"
-            animate="visible"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <StatCard
-                title="Courses Enrolled"
-                value={totalCoursesEnrolled}
-                icon={BookOpen}
-                color="primary"
-                trend={{ value: 12, isPositive: true }}
-              />
-              <StatCard
-                title="Completed Courses"
-                value={completedCourses}
-                icon={CheckCircle}
-                color="success"
-              />
-              <StatCard
-                title="Hours Learned"
-                value={Math.round(totalTimeSpent / 60)}
-                icon={Clock}
-                color="secondary"
-                trend={{ value: 8, isPositive: true }}
-              />
-              <StatCard
-                title="Badges Earned"
-                value={mockUser.badges.length}
-                icon={Award}
-                color="warning"
-              />
-            </div>
-          </motion.div>
-
-        {/* Main Content Tabs - Scrollable */}
-        <div className="flex-1 min-h-0">
-          <Tabs
-            selectedKey={activeTab}
-            onSelectionChange={(key) => setActiveTab(key as string)}
-            className="w-full h-full flex flex-col"
-          >
-            <Tab key="overview" title="Overview">
-              <div className="flex-1 overflow-auto">
-                <motion.div 
-                  className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-4 pb-6"
-                  variants={staggerContainer}
-                  initial="hidden"
-                  animate="visible"
-                >
-                {/* Continue Learning */}
-                <motion.div className="lg:col-span-2 space-y-4" variants={staggerItem}>
-                  <div className="flex items-center justify-between">
-                    <h2 className="font-manrope text-lg font-bold text-gray-900 dark:text-white">
-                      Continue Learning
-                    </h2>
-                    <CustomButton
-                      as={Link}
-                      href="/learn"
-                      variant="light"
-                      size="sm"
-                      rightIcon={ArrowRight}
-                    >
-                      View All
-                    </CustomButton>
-                  </div>
+    <div className="min-h-screen bg-white">
+      <motion.div
+        className="max-w-7xl mx-auto p-6 space-y-8"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        {/* User Profile Header */}
+        <motion.div variants={itemVariants}>
+          <Card className="border-2 border-gray-200 bg-gradient-to-r from-white to-gray-50">
+            <CardContent className="p-8">
+              <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+                <div className="flex items-center gap-6">
+                  <Avatar className="w-20 h-20 border-4 border-black">
+                    <AvatarImage src={mockUser.avatar} />
+                    <AvatarFallback className="bg-black text-white text-2xl font-bold">
+                      {mockUser.name.split(' ').map(n => n[0]).join('')}
+                    </AvatarFallback>
+                  </Avatar>
                   
-                  <motion.div 
-                    className="space-y-3"
-                    variants={staggerContainer}
-                    initial="hidden"
-                    animate="visible"
-                  >
-                  {mockProgress.map((progress) => {
-                    const course = mockCourses.find(c => c.id === progress.courseId);
-                    if (!course) return null;
+                  <div className="space-y-2">
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                      Welcome back, {mockUser.name.split(' ')[0]}!
+                    </h1>
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <Flame className="h-5 w-5 text-orange-500" />
+                        <span className="text-lg font-bold text-black">
+                          🔥 {mockUser.streak} Day Streak
+                        </span>
+                      </div>
+                      <Badge variant="outline" className="border-black text-black font-bold">
+                        Level {mockUser.level}
+                      </Badge>
+                    </div>
                     
-                    return (
-                      <motion.div
-                        key={progress.courseId}
-                        variants={staggerItem}
-                        whileHover={hoverScale}
-                        whileTap={tapScale}
-                      >
-                        <Card className="p-4">
-                          <div className="flex items-center gap-4">
-                            <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                              <img
-                                src={course.thumbnail}
-                                alt={course.title}
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h3 className="font-semibold text-lg truncate">{course.title}</h3>
-                              <p className="text-sm text-muted-foreground">
-                                {course.instructor.name} • {formatDuration(course.duration)}
-                              </p>
-                              <div className="mt-2">
-                                <ProgressBar
-                                  value={progress.progressPercentage}
-                                  showPercentage
-                                  animated
-                                />
-                              </div>
-                            </div>
-                            <div className="flex flex-col gap-2">
-                              <CustomButton
-                                as={Link}
-                                href={`/courses/${course.id}/lessons/${progress.currentLesson}`}
-                                color="primary"
-                                size="sm"
-                                rightIcon={Play}
-                              >
-                                Continue
-                              </CustomButton>
-                              <p className="text-xs text-muted-foreground text-center">
-                                {Math.round(progress.timeSpent / 60)}h spent
-                              </p>
-                            </div>
-                          </div>
-                        </Card>
-                      </motion.div>
-                    );
-                  })}
-                  </motion.div>
-                </motion.div>
-
-                {/* Sidebar */}
-                <motion.div className="space-y-4" variants={staggerItem}>
-                  {/* Learning Goals */}
-                  <motion.div variants={staggerItem} whileHover={hoverScale}>
-                    <Card className="h-fit">
-                      <CardHeader className="pb-2">
-                        <h3 className="font-semibold flex items-center gap-2 text-sm">
-                          <Target className="h-4 w-4" />
-                          This Week's Goal
-                        </h3>
-                      </CardHeader>
-                      <CardBody className="space-y-3 pt-0">
-                        <div className="text-center">
-                          <CircularProgress value={75} size={60} showPercentage />
-                          <p className="text-xs text-muted-foreground mt-2">
-                            5 hours completed of 7 hours goal
-                          </p>
-                        </div>
-                        <CustomButton
-                          color="primary"
-                          variant="flat"
-                          className="w-full"
-                          size="sm"
-                        >
-                          Update Goal
-                        </CustomButton>
-                      </CardBody>
-                    </Card>
-                  </motion.div>
-
-                  {/* Recent Activity */}
-                  <motion.div variants={staggerItem} whileHover={hoverScale}>
-                    <Card className="h-fit">
-                      <CardHeader className="pb-2">
-                        <h3 className="font-semibold flex items-center gap-2 text-sm">
-                          <Calendar className="h-4 w-4" />
-                          Recent Activity
-                        </h3>
-                      </CardHeader>
-                      <CardBody className="p-0 pt-0">
-                        <div className="max-h-48 overflow-y-auto">
-                          <motion.div 
-                            className="space-y-1"
-                            variants={staggerContainer}
-                            initial="hidden"
-                            animate="visible"
-                          >
-                            {recentActivity.map((activity, index) => (
-                              <ActivityItem key={index} {...activity} />
-                            ))}
-                          </motion.div>
-                        </div>
-                      </CardBody>
-                    </Card>
-                  </motion.div>
-
-                  {/* Badges */}
-                  <motion.div variants={staggerItem} whileHover={hoverScale}>
-                    <Card className="h-fit">
-                      <CardHeader className="pb-2">
-                        <h3 className="font-semibold flex items-center gap-2 text-sm">
-                          <Award className="h-4 w-4" />
-                          Recent Badges
-                        </h3>
-                      </CardHeader>
-                      <CardBody className="pt-0">
-                        <motion.div 
-                          className="grid grid-cols-2 gap-2"
-                          variants={staggerContainer}
-                          initial="hidden"
-                          animate="visible"
-                        >
-                          {mockUser.badges.map((badge) => (
-                            <motion.div
-                              key={badge.id}
-                              variants={staggerItem}
-                              whileHover={hoverScale}
-                              whileTap={tapScale}
-                              className="text-center p-2 rounded-lg bg-gray-50 dark:bg-gray-800"
-                            >
-                              <div className="text-lg mb-1">{badge.icon}</div>
-                              <p className="text-xs font-medium">{badge.name}</p>
-                            </motion.div>
-                          ))}
-                        </motion.div>
-                      </CardBody>
-                    </Card>
-                  </motion.div>
-                </motion.div>
-              </motion.div>
-            </div>
-            </Tab>
-
-            <Tab key="recommendations" title="Recommendations">
-              <div className="flex-1 overflow-auto">
-                <div className="mt-4 space-y-4 pb-6">
-                  <div>
-                    <h2 className="font-manrope text-lg font-bold text-gray-900 dark:text-white mb-2">
-                      Recommended for You
-                    </h2>
-                    <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm">
-                      Based on your learning progress and interests
-                    </p>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {recommendedCourses.map((course) => (
-                      <CourseCard key={course.id} course={course} />
-                    ))}
+                    {/* XP Progress */}
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">XP Progress</span>
+                        <span className="font-bold text-black">
+                          {mockUser.xp}/{mockUser.nextLevelXp}
+                        </span>
+                      </div>
+                      <Progress 
+                        value={(mockUser.xp / mockUser.nextLevelXp) * 100} 
+                        className="h-2 bg-gray-200"
+                      />
+                    </div>
                   </div>
                 </div>
+                
+                <div className="flex gap-3">
+                  <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Schedule
+                  </Button>
+                  <Button className="bg-primary text-white hover:bg-primary/90">
+                    <Target className="h-4 w-4 mr-2" />
+                    Set Goals
+                  </Button>
+                </div>
               </div>
-            </Tab>
+            </CardContent>
+          </Card>
+        </motion.div>
 
-            <Tab key="achievements" title="Achievements">
-              <div className="flex-1 overflow-auto">
-                <div className="mt-4 space-y-4 pb-6">
-                  <div>
-                    <h2 className="font-manrope text-lg font-bold text-gray-900 dark:text-white mb-2">
-                      Your Achievements
-                    </h2>
-                    <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm">
-                      Track your learning milestones and badges
-                    </p>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {mockUser.badges.map((badge) => (
-                      <Card key={badge.id}>
-                        <CardBody className="text-center space-y-3">
-                          <div className="text-3xl">{badge.icon}</div>
+        {/* Key Statistics */}
+        <motion.div variants={itemVariants}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <StatCard
+              title="Courses Enrolled"
+              value={totalCoursesEnrolled}
+              icon={BookOpen}
+              trend={{ value: 12, isPositive: true }}
+            />
+            <StatCard
+              title="Completed Courses"
+              value={completedCourses}
+              icon={CheckCircle}
+            />
+            <StatCard
+              title="Hours Learned"
+              value={Math.round(totalTimeSpent / 60)}
+              icon={Clock}
+              trend={{ value: 8, isPositive: true }}
+            />
+            <StatCard
+              title="Achievements"
+              value={unlockedAchievements}
+              icon={Trophy}
+            />
+          </div>
+        </motion.div>
+
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* In Progress Section */}
+          <motion.div className="lg:col-span-2 space-y-6" variants={itemVariants}>
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Continue Learning</h2>
+              <Button variant="ghost" asChild className="text-gray-700 hover:bg-gray-100">
+                <Link href="/learn">
+                  View All <ArrowRight className="h-4 w-4 ml-2" />
+                </Link>
+              </Button>
+            </div>
+            
+            <div className="space-y-4">
+              {coursesInProgress.map((course, index) => (
+                <motion.div
+                  key={course.id}
+                  variants={itemVariants}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Card className="border-2 border-gray-200 hover:border-black transition-all duration-300">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-6">
+                        <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 border-2 border-gray-200">
+                          <img
+                            src={course.thumbnail}
+                            alt={course.title}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                            <Play className="h-6 w-6 text-white" />
+                          </div>
+                        </div>
+                        
+                        <div className="flex-1 space-y-3">
                           <div>
-                            <h3 className="font-semibold text-sm">{badge.name}</h3>
-                            <p className="text-xs text-muted-foreground">{badge.description}</p>
+                            <h3 className="text-lg font-bold text-black">{course.title}</h3>
+                            <p className="text-sm text-gray-600">
+                              by {course.instructor} • Next: {course.nextLesson}
+                            </p>
                           </div>
-                          <p className="text-xs text-muted-foreground">
-                            Earned on {badge.earnedAt?.toLocaleDateString()}
-                          </p>
-                        </CardBody>
-                      </Card>
-                    ))}
-                    
-                    {/* Locked badges */}
-                    <Card className="opacity-60">
-                      <CardBody className="text-center space-y-3">
-                        <div className="text-3xl">🏆</div>
-                        <div>
-                          <h3 className="font-semibold text-sm">Course Master</h3>
-                          <p className="text-xs text-muted-foreground">Complete 10 courses</p>
+                          
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">Progress</span>
+                              <span className="font-bold text-black">{course.progress}%</span>
+                            </div>
+                            <Progress value={course.progress} className="h-2 bg-gray-200" />
+                          </div>
+                          
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-gray-500">
+                              {Math.round(course.timeSpent / 60)}h of {Math.round(course.totalDuration / 60)}h
+                            </span>
+                            <Button 
+                              size="sm" 
+                              className="bg-primary text-white hover:bg-primary/90"
+                              asChild
+                            >
+                              <Link href={`/courses/${course.id}`}>
+                                <Play className="h-4 w-4 mr-2" />
+                                Resume
+                              </Link>
+                            </Button>
+                          </div>
                         </div>
-                        <p className="text-xs text-muted-foreground">
-                          Progress: {completedCourses}/10
-                        </p>
-                      </CardBody>
-                    </Card>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Sidebar */}
+          <motion.div className="space-y-6" variants={itemVariants}>
+            {/* Weekly Goal */}
+            <Card className="border-2 border-gray-200">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-lg font-bold">
+                  <Target className="h-5 w-5" />
+                  This Week's Goal
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-center">
+                  <div className="relative w-24 h-24 mx-auto">
+                    <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="40"
+                        stroke="currentColor"
+                        strokeWidth="8"
+                        fill="transparent"
+                        className="text-gray-200"
+                      />
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="40"
+                        stroke="currentColor"
+                        strokeWidth="8"
+                        fill="transparent"
+                        strokeDasharray={`${2 * Math.PI * 40}`}
+                        strokeDashoffset={`${2 * Math.PI * 40 * (1 - 0.75)}`}
+                        className="text-black"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-xl font-black text-black">75%</span>
+                    </div>
                   </div>
+                  <p className="text-sm text-gray-600 mt-2">
+                    5 hours completed of 7 hours goal
+                  </p>
                 </div>
-              </div>
-            </Tab>
-          </Tabs>
+                <Button className="w-full bg-primary text-white hover:bg-primary/90">
+                  Update Goal
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Recent Achievements */}
+            <Card className="border-2 border-gray-200">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-lg font-bold">
+                  <Sparkles className="h-5 w-5" />
+                  Recent Achievements
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-3">
+                  {achievements.filter(a => a.isUnlocked).slice(0, 4).map((achievement) => (
+                    <AchievementBadge
+                      key={achievement.id}
+                      achievement={achievement}
+                      size="sm"
+                    />
+                  ))}
+                </div>
+                <Button 
+                  variant="ghost" 
+                  className="w-full mt-4 text-gray-700 hover:bg-gray-100"
+                  asChild
+                >
+                  <Link href="/achievements">
+                    View All <ArrowRight className="h-4 w-4 ml-2" />
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
         </div>
-      </div>
-    </PageContainer>
-    </PageTransition>
+
+        {/* Achievements Section */}
+        <motion.div variants={itemVariants}>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Your Achievements</h2>
+            <Button variant="ghost" className="text-gray-700 hover:bg-gray-100">
+              View All <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+            {achievements.map((achievement) => (
+              <AchievementBadge
+                key={achievement.id}
+                achievement={achievement}
+                size="md"
+              />
+            ))}
+          </div>
+        </motion.div>
+      </motion.div>
+    </div>
   );
 }

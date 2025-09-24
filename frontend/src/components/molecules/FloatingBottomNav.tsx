@@ -23,7 +23,6 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { createPortal } from "react-dom";
-import { ThemeToggle } from "@/components/atoms/ThemeToggle";
 
 interface NavItem {
   href: string;
@@ -275,8 +274,8 @@ export function FloatingBottomNav({
         animate={{ opacity: 1, y: 0 }}
         className={cn(
           "fixed bottom-4 left-1/2 transform -translate-x-1/2 z-40",
-          "bg-white/90 dark:bg-black/90 backdrop-blur-lg",
-          "border border-gray-200 dark:border-gray-800",
+          "bg-black/90 backdrop-blur-lg",
+          "border border-gray-700",
           "rounded-full shadow-md",
           "px-4 py-2",
           "flex items-center gap-2",
@@ -296,7 +295,7 @@ export function FloatingBottomNav({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setShowSearchDropUp(true)}
-              startContent={<Search className="h-4 w-4 text-gray-400" />}
+              startContent={<Search className="h-4 w-4 text-white" />}
               endContent={
                 searchQuery && (
                   <Button
@@ -308,14 +307,14 @@ export function FloatingBottomNav({
                       setSearchResults([]);
                     }}
                   >
-                    <X className="h-3 w-3" />
+                    <X className="h-3 w-3 text-white" />
                   </Button>
                 )
               }
               classNames={{
                 base: "h-10",
-                input: "text-sm",
-                inputWrapper: "rounded-full border-none bg-gray-100 dark:bg-gray-900",
+                input: "text-sm text-white placeholder:text-gray-300",
+                inputWrapper: "rounded-full border-none bg-gray-800",
               }}
             />
             <AnimatePresence>
@@ -331,7 +330,7 @@ export function FloatingBottomNav({
               isIconOnly
               variant="light"
               onClick={() => setShowProfileDropUp(!showProfileDropUp)}
-              className="rounded-full h-10 w-10 min-w-10"
+              className="rounded-full h-10 w-10 min-w-10 text-white hover:bg-gray-700"
             >
               {isAuthenticated && user?.avatar ? (
                 <Avatar
@@ -340,9 +339,9 @@ export function FloatingBottomNav({
                   className="h-6 w-6"
                 />
               ) : isAuthenticated ? (
-                <User className="h-4 w-4" />
+                <User className="h-4 w-4 text-white" />
               ) : (
-                <LogIn className="h-4 w-4" />
+                <LogIn className="h-4 w-4 text-white" />
               )}
             </Button>
             <AnimatePresence>
@@ -366,10 +365,13 @@ export function FloatingBottomNav({
                 isIconOnly
                 variant={active ? "solid" : "light"}
                 color={active ? "primary" : "default"}
-                className="rounded-full h-10 px-4 min-w-0"
-                startContent={<Icon className="h-4 w-4" />}
+                className={cn(
+                  "rounded-full h-10 px-4 min-w-0",
+                  !active && "text-white hover:bg-gray-700"
+                )}
+                startContent={<Icon className={cn("h-4 w-4", !active && "text-white")} />}
               >
-                <span className="hidden lg:inline">{item.label}</span>
+                <span className={cn("hidden lg:inline", !active && "text-white")}>{item.label}</span>
               </Button>
             );
           })}
@@ -381,7 +383,7 @@ export function FloatingBottomNav({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setShowSearchDropUp(true)}
-              startContent={<Search className="h-4 w-4 text-gray-400" />}
+              startContent={<Search className="h-4 w-4 text-white" />}
               endContent={
                 searchQuery && (
                   <Button
@@ -393,14 +395,14 @@ export function FloatingBottomNav({
                       setSearchResults([]);
                     }}
                   >
-                    <X className="h-3 w-3" />
+                    <X className="h-3 w-3 text-white" />
                   </Button>
                 )
               }
               classNames={{
                 base: "w-64 h-10",
-                input: "text-sm",
-                inputWrapper: "rounded-full border-none bg-gray-100 dark:bg-gray-900",
+                input: "text-sm text-white placeholder:text-gray-300",
+                inputWrapper: "rounded-full border-none bg-gray-800",
               }}
             />
             <AnimatePresence>
@@ -408,16 +410,13 @@ export function FloatingBottomNav({
             </AnimatePresence>
           </div>
 
-          {/* Theme Toggle */}
-          <ThemeToggle size="sm" className="rounded-full" />
-
           {/* Profile/Login */}
           <div ref={profileRef} className="relative">
             <Button
               isIconOnly
               variant="light"
               onClick={() => setShowProfileDropUp(!showProfileDropUp)}
-              className="rounded-full h-10 w-10 min-w-10"
+              className="rounded-full h-10 w-10 min-w-10 text-white hover:bg-gray-700"
             >
               {isAuthenticated && user?.avatar ? (
                 <Avatar
@@ -426,9 +425,9 @@ export function FloatingBottomNav({
                   className="h-6 w-6"
                 />
               ) : isAuthenticated ? (
-                <User className="h-4 w-4" />
+                <User className="h-4 w-4 text-white" />
               ) : (
-                <LogIn className="h-4 w-4" />
+                <LogIn className="h-4 w-4 text-white" />
               )}
             </Button>
             <AnimatePresence>
@@ -445,7 +444,7 @@ export function FloatingBottomNav({
         transition={{ delay: 0.1 }}
         className="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-30 md:hidden"
       >
-        <div className="flex items-center gap-2 bg-white/90 dark:bg-black/90 backdrop-blur-lg border border-gray-200 dark:border-gray-800 rounded-full px-4 py-2 shadow-md">
+        <div className="flex items-center gap-2 bg-black/90 backdrop-blur-lg border border-gray-700 rounded-full px-4 py-2 shadow-md">
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.href);
@@ -458,17 +457,12 @@ export function FloatingBottomNav({
                 isIconOnly
                 variant={active ? "solid" : "light"}
                 color={active ? "primary" : "default"}
-                className="rounded-full h-10 w-10 min-w-10"
+                className={`rounded-full h-10 w-10 min-w-10 ${!active ? 'text-white hover:bg-gray-700' : ''}`}
               >
-                <Icon className="h-4 w-4" />
+                <Icon className={`h-4 w-4 ${!active ? 'text-white' : ''}`} />
               </Button>
             );
           })}
-          
-          {/* Theme Toggle for Mobile */}
-          <div className="border-l border-gray-200 dark:border-gray-700 pl-2 ml-2">
-            <ThemeToggle size="sm" className="rounded-full h-10 w-10 min-w-10" />
-          </div>
         </div>
       </motion.div>
     </>

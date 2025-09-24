@@ -135,7 +135,7 @@ export function CourseCard({
   );
 
   return (
-    <Link href={`/courses/${course.id}`} className="block">
+    <Link href={`/learn/${course.id}`} className="block">
       {cardContent}
     </Link>
   );

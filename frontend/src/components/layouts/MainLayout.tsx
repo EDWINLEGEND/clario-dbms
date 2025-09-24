@@ -1,8 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
-import { ModernNavbar } from "@/components/molecules/ModernNavbar";
-import { BottomNav } from "@/components/molecules/BottomNav";
+import { FloatingBottomNav } from "@/components/molecules/FloatingBottomNav";
 import { User } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -18,36 +17,32 @@ export function MainLayout({
   children,
   user,
   showBottomNav = true,
-  showHeader = true,
+  showHeader = false, // Disable header by default for floating nav
   className,
 }: MainLayoutProps) {
   return (
     <div className="min-h-screen bg-background">
-      {/* Header - hidden on mobile when bottom nav is shown */}
-      {showHeader && (
-        <div className={cn(showBottomNav && "hidden sm:block")}>
-          <ModernNavbar user={user} />
-        </div>
-      )}
-
-      {/* Main content */}
+      {/* Main content - full viewport with floating nav */}
       <main
         className={cn(
-          "flex-1",
-          showHeader && !showBottomNav && "pt-16", // Add padding when only header is shown
-          showBottomNav && "pb-16 sm:pb-0", // Add bottom padding on mobile when bottom nav is shown
-          showBottomNav && showHeader && "sm:pt-16", // Add top padding on desktop when both are shown
+          "min-h-screen",
+          showBottomNav && "pb-20", // Add bottom padding for floating nav
           className
         )}
       >
         {children}
       </main>
 
-      {/* Bottom Navigation - only on mobile */}
+      {/* Floating Bottom Navigation */}
       {showBottomNav && (
-        <div className="sm:hidden">
-          <BottomNav isAuthenticated={!!user} />
-        </div>
+        <FloatingBottomNav 
+          isAuthenticated={!!user} 
+          user={user ? {
+            name: user.name || user.email,
+            email: user.email,
+            avatar: user.avatar
+          } : undefined}
+        />
       )}
     </div>
   );

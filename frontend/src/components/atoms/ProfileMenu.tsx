@@ -16,7 +16,6 @@ import {
   ChevronRight
 } from "lucide-react";
 import { Avatar, Button, Divider, Badge } from "@heroui/react";
-import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 
 // Define a common type for menu items to maintain strict typing across defaults and customs
@@ -43,7 +42,6 @@ interface ProfileMenuProps {
   onLogout?: () => void;
   className?: string;
   placement?: "bottom-start" | "bottom-end" | "top-start" | "top-end";
-  showThemeToggle?: boolean;
   customMenuItems?: Array<{
     id: string;
     label: string;
@@ -69,13 +67,11 @@ export function ProfileMenu({
   onLogout,
   className,
   placement = "bottom-end",
-  showThemeToggle = true,
   customMenuItems = []
 }: ProfileMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const { theme, setTheme, resolvedTheme } = useTheme();
 
   useEffect(() => {
     setMounted(true);
@@ -104,28 +100,6 @@ export function ProfileMenu({
       document.removeEventListener("keydown", handleEscape);
     };
   }, [isOpen]);
-
-  const cycleTheme = () => {
-    if (theme === "light") {
-      setTheme("dark");
-    } else if (theme === "dark") {
-      setTheme("system");
-    } else {
-      setTheme("light");
-    }
-  };
-
-  const getThemeIcon = () => {
-    if (!mounted) return <Monitor className="h-4 w-4" />;
-    if (theme === "system") return <Monitor className="h-4 w-4" />;
-    return resolvedTheme === "dark" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />;
-  };
-
-  const getThemeLabel = () => {
-    if (!mounted) return "System";
-    if (theme === "system") return "System";
-    return resolvedTheme === "dark" ? "Dark" : "Light";
-  };
 
   const defaultMenuItems: MenuItem[] = [
     {
@@ -313,37 +287,6 @@ export function ProfileMenu({
               })}
 
               {/* Theme Toggle */}
-              {showThemeToggle && (
-                <>
-                  <Divider className="my-2" />
-                  <motion.button
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: allMenuItems.length * 0.05, duration: 0.2 }}
-                    onClick={cycleTheme}
-                    className={cn(
-                      "w-full flex items-center gap-3 px-4 py-3",
-                      "text-left text-sm transition-colors duration-200",
-                      "hover:bg-surface-hover focus:outline-none focus:bg-surface-hover"
-                    )}
-                  >
-                    <motion.div
-                      key={`${theme ?? "system"}-${resolvedTheme ?? ""}`}
-                      className="flex-shrink-0 text-muted-foreground"
-                      initial={{ scale: 0.8, rotate: -180 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      transition={{ duration: 0.3, ease: "easeOut" }}
-                    >
-                      {getThemeIcon()}
-                    </motion.div>
-                    <span className="flex-1 text-foreground">
-                      Theme: {getThemeLabel()}
-                    </span>
-                    <ChevronRight className="h-3 w-3 text-muted-foreground" />
-                  </motion.button>
-                </>
-              )}
-
               {/* Logout */}
               {onLogout && (
                 <>
@@ -382,7 +325,6 @@ export function CompactProfileMenu(props: Omit<ProfileMenuProps, 'className'>) {
     <ProfileMenu
       {...props}
       className="sm:hidden"
-      showThemeToggle={false}
       customMenuItems={[]}
     />
   );

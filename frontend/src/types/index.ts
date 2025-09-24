@@ -187,6 +187,45 @@ export interface PaginationMeta {
   totalPages: number;
 }
 
+// Video API types
+export interface VideoSearchResult {
+  videoId: string;
+  title: string;
+  description: string;
+  thumbnailUrl: string;
+  channelTitle: string;
+  publishedAt: string;
+  duration: string;
+  viewCount: string;
+  likeCount: string;
+  compatibilityScore: number;
+  tags: string[];
+}
+
+export interface VideoSearchResponse {
+  query: string;
+  items: VideoSearchResult[];
+  metrics: {
+    total: number;
+    avgCompatibility: number;
+  };
+}
+
+export interface VideoDetail {
+  videoId: string;
+  title: string;
+  description: string;
+  thumbnailUrl: string;
+  channelTitle: string;
+  publishedAt: string;
+  duration: string;
+  viewCount: string;
+  likeCount: string;
+  transcript: string | null;
+  tags: string[];
+}
+
+// API Response types
 export interface ApiResponse<T> {
   data: T;
   meta?: PaginationMeta;

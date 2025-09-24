@@ -21,7 +21,6 @@ import {
 import { Search, Bell, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { ThemeToggle } from "@/components/atoms/ThemeToggle";
 import { CustomAvatar } from "@/components/atoms/CustomAvatar";
 import { LoginDropup } from "@/components/molecules/LoginDropup";
 import { User } from "@/types";
@@ -65,8 +64,8 @@ export function Header({ user, className }: HeaderProps) {
     <Navbar
       onMenuOpenChange={setIsMenuOpen}
       className={cn(
-        "bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg",
-        "border-b border-gray-200 dark:border-gray-800",
+        "bg-white dark:bg-black backdrop-blur-lg",
+        "border-b border-gray-200 dark:border-gray-700",
         className
       )}
       maxWidth="full"
@@ -83,7 +82,7 @@ export function Header({ user, className }: HeaderProps) {
       <NavbarContent className="sm:hidden pr-3" justify="center">
         <NavbarBrand>
           <Link href="/" className="font-bold text-xl font-manrope">
-            <span className="text-primary-600 dark:text-primary-400">CLARIO</span>
+            <span className="text-black dark:text-white">CLARIO</span>
           </Link>
         </NavbarBrand>
       </NavbarContent>
@@ -92,7 +91,7 @@ export function Header({ user, className }: HeaderProps) {
       <NavbarContent className="hidden sm:flex gap-8" justify="start">
         <NavbarBrand>
           <Link href="/" className="font-bold text-2xl font-manrope">
-            <span className="text-primary-600 dark:text-primary-400">CLARIO</span>
+            <span className="text-black dark:text-white">CLARIO</span>
           </Link>
         </NavbarBrand>
         
@@ -101,10 +100,10 @@ export function Header({ user, className }: HeaderProps) {
             <Link
               href={item.href}
               className={cn(
-                "relative font-medium transition-all duration-200 hover:text-primary-600 dark:hover:text-primary-400 hover:scale-105",
+                "relative font-medium transition-all duration-200 hover:text-black dark:hover:text-white hover:scale-105",
                 isActive(item.href)
-                  ? "text-primary-600 dark:text-primary-400"
-                  : "text-gray-700 dark:text-gray-300"
+                  ? "text-black dark:text-white"
+                  : "text-gray-600 dark:text-gray-300"
               )}
             >
               <motion.span
@@ -116,7 +115,7 @@ export function Header({ user, className }: HeaderProps) {
               </motion.span>
               {isActive(item.href) && (
                 <motion.div
-                  className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary-600 dark:bg-primary-400 rounded-full"
+                  className="absolute -bottom-1 left-0 right-0 h-0.5 bg-black dark:bg-white rounded-full"
                   layoutId="activeTab"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -142,7 +141,7 @@ export function Header({ user, className }: HeaderProps) {
               }}
               placeholder="Search courses..."
               size="sm"
-              startContent={<Search className="h-4 w-4" />}
+              startContent={<Search className="h-4 w-4 text-white" />}
               type="search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -150,17 +149,12 @@ export function Header({ user, className }: HeaderProps) {
           </form>
         </NavbarItem>
 
-        {/* Theme toggle */}
-        <NavbarItem className="hidden sm:flex">
-          <ThemeToggle />
-        </NavbarItem>
-
         {user ? (
           <>
             {/* Notifications */}
             <NavbarItem>
               <Button isIconOnly variant="light" aria-label="Notifications">
-                <Bell className="h-5 w-5" />
+                <Bell className="h-5 w-5 text-white" />
               </Button>
             </NavbarItem>
 
@@ -174,7 +168,7 @@ export function Header({ user, className }: HeaderProps) {
                   >
                     <div className="flex items-center gap-2">
                       <CustomAvatar name={user.name} src={user.avatar} size="sm" />
-                      <ChevronDown className="h-4 w-4" />
+                      <ChevronDown className="h-4 w-4 text-white" />
                     </div>
                   </Button>
                 </DropdownTrigger>
@@ -198,14 +192,13 @@ export function Header({ user, className }: HeaderProps) {
         ) : (
           <NavbarItem className="relative">
             <Button 
-              color="primary" 
-              variant="flat"
-              onClick={() => setShowLoginDropup(!showLoginDropup)}
+              variant="bordered"
+              size="sm"
+              onPress={() => setShowLoginDropup(!showLoginDropup)}
               className={cn(
-                "transition-all duration-300 hover:scale-105 font-medium",
-                "bg-primary-50 dark:bg-primary-900/20 hover:bg-primary-100 dark:hover:bg-primary-900/40",
-                "border border-primary-200 dark:border-primary-800",
-                showLoginDropup && "ring-2 ring-primary-500/20 bg-primary-100 dark:bg-primary-900/40"
+                "bg-white dark:bg-black hover:bg-gray-100 dark:hover:bg-gray-800",
+                "border border-gray-300 dark:border-gray-600",
+                showLoginDropup && "ring-2 ring-gray-400/20 bg-gray-100 dark:bg-gray-800"
               )}
             >
               Sign In
@@ -241,7 +234,7 @@ export function Header({ user, className }: HeaderProps) {
                 >
                   <Input
                     placeholder="Search courses..."
-                    startContent={<Search className="h-4 w-4" />}
+                    startContent={<Search className="h-4 w-4 text-white" />}
                     type="search"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -260,10 +253,10 @@ export function Header({ user, className }: HeaderProps) {
                     <Link
                       href={item.href}
                       className={cn(
-                        "w-full font-medium transition-all duration-200 hover:text-primary-600 dark:hover:text-primary-400 hover:translate-x-2",
+                        "w-full font-medium transition-all duration-200 hover:text-black dark:hover:text-white hover:translate-x-2",
                         isActive(item.href)
-                          ? "text-primary-600 dark:text-primary-400"
-                          : "text-gray-700 dark:text-gray-300"
+                          ? "text-black dark:text-white"
+                          : "text-gray-600 dark:text-gray-300"
                       )}
                       onClick={() => setIsMenuOpen(false)}
                     >
@@ -279,18 +272,6 @@ export function Header({ user, className }: HeaderProps) {
                 </NavbarMenuItem>
               ))}
 
-              {/* Theme toggle in mobile menu */}
-              <NavbarMenuItem>
-                <motion.div 
-                  className="flex items-center gap-2"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3 }}
-                >
-                  <span className="text-sm font-medium">Theme:</span>
-                  <ThemeToggle showLabel />
-                </motion.div>
-              </NavbarMenuItem>
             </NavbarMenu>
           </motion.div>
         )}

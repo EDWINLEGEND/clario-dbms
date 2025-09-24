@@ -1,65 +1,80 @@
-import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+  return twMerge(clsx(inputs))
 }
 
-export function formatDate(date: Date | string): string {
-  const d = new Date(date);
-  return d.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-}
-
+/**
+ * Formats duration in minutes to a human-readable string
+ * @param minutes - Duration in minutes
+ * @returns Formatted duration string (e.g., "2h 30m", "45m", "1h")
+ */
 export function formatDuration(minutes: number): string {
-  const hours = Math.floor(minutes / 60);
-  const mins = minutes % 60;
-  
-  if (hours === 0) {
-    return `${mins}m`;
+  if (minutes < 60) {
+    return `${minutes}m`
   }
   
-  return `${hours}h ${mins}m`;
+  const hours = Math.floor(minutes / 60)
+  const remainingMinutes = minutes % 60
+  
+  if (remainingMinutes === 0) {
+    return `${hours}h`
+  }
+  
+  return `${hours}h ${remainingMinutes}m`
 }
 
-export function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^\w\s-]/g, "")
-    .replace(/[\s_-]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+/**
+ * Calculates progress percentage based on completed lessons and total lessons
+ * @param completedLessons - Array of completed lesson IDs
+ * @param totalLessons - Total number of lessons or array of lesson IDs
+ * @returns Progress percentage (0-100)
+ */
+export function calculateProgress(
+  completedLessons: string[], 
+  totalLessons: number | string[]
+): number {
+  const total = typeof totalLessons === 'number' ? totalLessons : totalLessons.length
+  
+  if (total === 0) return 0
+  
+  const completed = completedLessons.length
+  return Math.round((completed / total) * 100)
 }
 
-export function truncateText(text: string, maxLength: number): string {
-  if (text.length <= maxLength) return text;
-  return text.slice(0, maxLength).trim() + "...";
-}
-
-export function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-}
-
-export function calculateProgress(completed: number, total: number): number {
-  if (total === 0) return 0;
-  return Math.round((completed / total) * 100);
-}
-
-// Use any[] for function args to allow narrower parameter types at call sites
+/**
+ * Creates a debounced function that delays invoking func until after wait milliseconds
+ * @param func - The function to debounce
+ * @param wait - The number of milliseconds to delay
+ * @returns The debounced function
+ */
 export function debounce<T extends (...args: any[]) => any>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
-  let timeout: NodeJS.Timeout;
+  let timeout: NodeJS.Timeout | null = null
+  
   return (...args: Parameters<T>) => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
-  };
+    if (timeout) {
+      clearTimeout(timeout)
+    }
+    
+    timeout = setTimeout(() => {
+      func(...args)
+    }, wait)
+  }
+}
+
+/**
+ * Gets initials from a full name
+ * @param name - The full name
+ * @returns Initials (e.g., "John Doe" -> "JD")
+ */
+export function getInitials(name: string): string {
+  return name
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase())
+    .slice(0, 2)
+    .join('')
 }

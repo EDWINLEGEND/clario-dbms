@@ -1,27 +1,23 @@
 "use client";
 
 import { HeroUIProvider } from "@heroui/react";
-import { ThemeProvider as NextThemesProvider } from "next-themes";
-import type { ThemeProviderProps } from "next-themes";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 export interface ProvidersProps {
   children: React.ReactNode;
-  themeProps?: ThemeProviderProps;
 }
 
-export function Providers({ children, themeProps }: ProvidersProps) {
+export function Providers({ children }: ProvidersProps) {
+  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
+
   return (
-    <NextThemesProvider
-      defaultTheme="system"
-      attribute="class"
-      enableSystem
-      enableColorScheme
-      storageKey="clario-theme"
-      {...themeProps}
-    >
+    <GoogleOAuthProvider clientId={googleClientId}>
       <HeroUIProvider>
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </HeroUIProvider>
-    </NextThemesProvider>
+    </GoogleOAuthProvider>
   );
 }

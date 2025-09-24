@@ -23,6 +23,7 @@ import { CustomButton } from "@/components/atoms/CustomButton";
 import { LevelBadge } from "@/components/atoms/CustomBadge";
 import { CustomAvatar, AvatarGroup } from "@/components/atoms/CustomAvatar";
 import { PageTransition, staggerContainer, staggerItem, hoverScale, tapScale } from "@/components/atoms/PageTransition";
+import { MainLayout } from "@/components/layouts/MainLayout";
 import { Track } from "@/types";
 import { cn, formatDuration } from "@/lib/utils";
 
@@ -140,19 +141,12 @@ function TrackCard({ track, progress, showProgress = false }: TrackCardProps) {
 
   return (
     <Card
-      className="group cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-lg"
-      onClick={handleCardClick}
-      role="link"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          router.push(`/tracks/${track.id}`);
-        }
-      }}
+      isPressable
+      onPress={handleCardClick}
+      className="group cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-1 border-white/10 bg-black"
     >
-      <CardHeader className="p-0">
-        <div className="relative aspect-[2/1] w-full overflow-hidden rounded-t-lg">
+      <CardHeader className="p-0 relative">
+        <div className="relative aspect-video w-full overflow-hidden rounded-t-lg">
           <Image
             src={track.thumbnail}
             alt={track.title}
@@ -160,93 +154,95 @@ function TrackCard({ track, progress, showProgress = false }: TrackCardProps) {
             className="object-cover transition-transform duration-200 group-hover:scale-105"
           />
           
-          {/* Overlay with play button */}
-          <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-            <div className="rounded-full bg-white/90 p-4">
-              <Play className="h-8 w-8 text-primary-600" fill="currentColor" />
-            </div>
-          </div>
-          
           {/* Duration badge */}
-          <div className="absolute bottom-3 right-3">
-            <Chip
-              color="default"
-              variant="solid"
-              size="sm"
-              className="bg-black/70 text-white"
-              startContent={<Clock className="h-3 w-3" />}
-            >
+          <div className="absolute bottom-2 right-2">
+            <Chip size="sm" className="bg-white text-black border-0">
+              <Clock className="w-3 h-3 mr-1" />
               {formatDuration(track.totalDuration)}
             </Chip>
           </div>
           
           {/* Level badge */}
           <div className="absolute top-3 left-3">
-            <LevelBadge level={track.level} />
+            <Chip variant="bordered" size="sm" className="border-white/20 text-white bg-black">
+              {track.level.charAt(0).toUpperCase() + track.level.slice(1)}
+            </Chip>
           </div>
         </div>
       </CardHeader>
 
-      <CardBody className="space-y-4">
+      <CardBody className="space-y-4 bg-black">
         {/* Track title */}
-        <h3 className="font-manrope text-xl font-bold line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+        <h3 className="font-manrope text-xl font-bold line-clamp-2 text-white group-hover:text-white/80 transition-colors">
           {track.title}
         </h3>
         
         {/* Track description */}
-        <p className="text-sm text-muted-foreground line-clamp-3">
+        <p className="text-sm text-white/80 line-clamp-3">
           {track.description}
         </p>
         
-        {/* Instructors */}
-        <div className="flex items-center gap-3">
-          <AvatarGroup users={mockInstructors} max={3} size="sm" />
-          <span className="text-sm text-muted-foreground">
-            {mockInstructors.length} instructors
-          </span>
-        </div>
+        {/* Category badge */}
+        <Chip variant="bordered" size="sm" className="border-white/20 text-white bg-black">
+          {track.category}
+        </Chip>
         
-        {/* Progress bar */}
+        {/* Progress bar (if applicable) */}
         {showProgress && progress !== undefined && (
           <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="font-medium">Progress</span>
-              <span className="text-muted-foreground">{progress}%</span>
+            <div className="flex justify-between text-xs text-white/80">
+              <span>Progress</span>
+              <span>{progress}%</span>
             </div>
-            <Progress value={progress} className="w-full" />
+            <Progress 
+              value={progress} 
+              className="h-1"
+              classNames={{
+                track: "bg-white/20",
+                indicator: "bg-white"
+              }}
+            />
           </div>
         )}
-      </CardBody>
-
-      <CardFooter className="flex items-center justify-between pt-0">
-        {/* Stats */}
-        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-          <div className="flex items-center gap-1">
-            <BookOpen className="h-4 w-4" />
-            <span>8 courses</span>
+        
+        {/* Instructors */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <AvatarGroup users={mockInstructors} size="sm" max={3} />
+            <span className="text-xs text-white/80">
+              {mockInstructors.length} instructors
+            </span>
           </div>
-          <div className="flex items-center gap-1">
-            <Users className="h-4 w-4" />
+          
+          <div className="flex items-center gap-1 text-xs text-white/80">
+            <Users className="h-3 w-3 text-white" />
             <span>{track.enrollmentCount.toLocaleString()}</span>
           </div>
-          <div className="flex items-center gap-1">
-            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-            <span>4.8</span>
-          </div>
         </div>
-        
-        {/* CTA */}
-        <CustomButton
-          as={Link}
-          href={`/tracks/${track.id}`}
-          color="primary"
-          variant="flat"
-          size="sm"
-          rightIcon={ArrowRight}
-          onClick={(e) => e.stopPropagation()}
-        >
-          {showProgress ? "Continue" : "Start Track"}
-        </CustomButton>
+      </CardBody>
+
+      <CardFooter className="bg-black border-t border-white/10">
+        <div className="flex w-full items-center justify-between">
+          <div className="flex items-center gap-4 text-sm text-white/80">
+            <div className="flex items-center gap-1">
+              <BookOpen className="h-4 w-4 text-white" />
+              <span>{track.courses?.length || 0} courses</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Clock className="h-4 w-4 text-white" />
+              <span>{formatDuration(track.totalDuration)}</span>
+            </div>
+          </div>
+          
+          <CustomButton
+            size="sm"
+            variant="bordered"
+            className="border-white/20 text-white bg-black hover:bg-white hover:text-black transition-all duration-200"
+            rightIcon={ArrowRight}
+          >
+            Start Track
+          </CustomButton>
+        </div>
       </CardFooter>
     </Card>
   );
@@ -287,249 +283,264 @@ export default function TracksPage() {
   });
 
   return (
-    <PageTransition>
-      <PageContainer className="h-full">
-        <div className="h-full flex flex-col">
-        {/* Header - Fixed */}
-        <div className="flex-shrink-0 mb-6">
-          <h1 className="font-manrope text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Learning Tracks
-          </h1>
-          <p className="text-gray-600 dark:text-gray-300 text-sm lg:text-base">
-            Structured learning paths to master new skills step by step
-          </p>
-        </div>
+    <MainLayout>
+      <PageTransition>
+        <div className="min-h-screen bg-black">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {/* Header */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="mb-8"
+            >
+              <h1 className="text-3xl font-bold text-white mb-4">
+                Learning Tracks
+              </h1>
+              <p className="text-white/80">
+                Structured learning paths to master complete skill sets
+              </p>
+            </motion.div>
 
-        {/* Search and Filters - Fixed */}
-        <div className="flex-shrink-0 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-            <div className="md:col-span-2">
-              <Input
-                placeholder="Search tracks..."
-                startContent={<Search className="h-4 w-4 text-gray-400" />}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                classNames={{
-                  inputWrapper: "h-10",
-                }}
-              />
-            </div>
-            
-            <Select
-              label="Category"
-              selectedKeys={new Set([selectedCategory])}
-              onSelectionChange={(keys) => setSelectedCategory(Array.from(keys)[0] as string)}
-              classNames={{
-                trigger: "h-10",
-              }}
+            {/* Search and Filters */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="mb-8"
             >
-              {categories.map((category) => (
-                <SelectItem key={category}>
-                  {category}
-                </SelectItem>
-              ))}
-            </Select>
-            
-            <Select
-              label="Level"
-              selectedKeys={new Set([selectedLevel])}
-              onSelectionChange={(keys) => setSelectedLevel(Array.from(keys)[0] as string)}
-              classNames={{
-                trigger: "h-10",
-              }}
-            >
-              {levels.map((level) => (
-                <SelectItem key={level}>
-                                 {level.charAt(0).toUpperCase() + level.slice(1)}
-                               </SelectItem>
-              ))}
-            </Select>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <p className="text-gray-600 dark:text-gray-300 text-sm">
-              {filteredTracks.length} tracks found
-            </p>
-            
-            <Select
-              label="Sort by"
-              selectedKeys={new Set([sortBy])}
-              onSelectionChange={(keys) => setSortBy(Array.from(keys)[0] as string)}
-              className="w-full sm:w-48"
-              classNames={{
-                trigger: "h-10",
-              }}
-            >
-              <SelectItem key="popular">Most Popular</SelectItem>
-              <SelectItem key="newest">Newest</SelectItem>
-              <SelectItem key="duration-short">Shortest First</SelectItem>
-              <SelectItem key="duration-long">Longest First</SelectItem>
-            </Select>
-          </div>
-        </div>
-
-        {/* Content - Scrollable */}
-        <div className="flex-1 overflow-y-auto space-y-8">
-          {/* Featured Track */}
-          {filteredTracks.length > 0 && (
-            <div className="flex-shrink-0">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="font-manrope text-xl lg:text-2xl font-bold text-gray-900 dark:text-white">
-                  Featured Track
-                </h2>
-              </div>
-            
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-center">
-                <div className="space-y-4 lg:space-y-6">
-                  <div className="space-y-3 lg:space-y-4">
-                    <div className="flex items-center gap-3">
-                      <LevelBadge level={filteredTracks[0].level} />
-                      <Chip color="primary" variant="flat" size="sm">
-                        {filteredTracks[0].category}
-                      </Chip>
-                    </div>
-                    
-                    <h3 className="font-manrope text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">
-                      {filteredTracks[0].title}
-                    </h3>
-                    
-                    <p className="text-base lg:text-lg text-gray-600 dark:text-gray-300">
-                      {filteredTracks[0].description}
-                    </p>
-                  </div>
-                
-                <div className="flex items-center gap-6 text-sm text-gray-600 dark:text-gray-300">
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
-                    <span>{formatDuration(filteredTracks[0].totalDuration)}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <BookOpen className="h-4 w-4" />
-                    <span>8 courses</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4" />
-                    <span>{filteredTracks[0].enrollmentCount.toLocaleString()} enrolled</span>
-                  </div>
-                </div>
-                
-                  <div className="flex flex-col sm:flex-row gap-3 lg:gap-4">
-                    <CustomButton
-                      as={Link}
-                      href={`/tracks/${filteredTracks[0].id}`}
-                      color="primary"
-                      size="md"
-                      rightIcon={ArrowRight}
-                      className="w-full sm:w-auto"
-                    >
-                      Start Learning
-                    </CustomButton>
-                    <CustomButton
-                      as={Link}
-                      href={`/tracks/${filteredTracks[0].id}`}
-                      variant="bordered"
-                      size="md"
-                      className="w-full sm:w-auto"
-                    >
-                      View Details
-                    </CustomButton>
-                  </div>
-                </div>
-                
-                <div className="relative aspect-[4/3] rounded-lg overflow-hidden">
-                  <Image
-                    src={filteredTracks[0].thumbnail}
-                    alt={filteredTracks[0].title}
-                    fill
-                    className="object-cover"
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                <div className="md:col-span-2">
+                  <Input
+                    placeholder="Search tracks..."
+                    startContent={<Search className="h-4 w-4 text-white/60" />}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    classNames={{
+                      inputWrapper: "h-12 bg-black border border-white/20 hover:border-white/40 focus-within:border-white",
+                      input: "text-white placeholder:text-white/60",
+                    }}
                   />
                 </div>
+                
+                <Select
+                  label="Category"
+                  selectedKeys={new Set([selectedCategory])}
+                  onSelectionChange={(keys) => setSelectedCategory(Array.from(keys)[0] as string)}
+                  classNames={{
+                    trigger: "h-12 bg-black border border-white/20 hover:border-white/40 focus:border-white",
+                    label: "text-white/80",
+                    value: "text-white",
+                    selectorIcon: "text-white",
+                    popoverContent: "bg-black border border-white/20",
+                  }}
+                >
+                  {categories.map((category) => (
+                    <SelectItem key={category} classNames={{
+                      base: "text-white hover:bg-white/10 focus:bg-white/10",
+                    }}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </Select>
+                
+                <Select
+                  label="Level"
+                  selectedKeys={new Set([selectedLevel])}
+                  onSelectionChange={(keys) => setSelectedLevel(Array.from(keys)[0] as string)}
+                  classNames={{
+                    trigger: "h-12 bg-black border border-white/20 hover:border-white/40 focus:border-white",
+                    label: "text-white/80",
+                    value: "text-white",
+                    selectorIcon: "text-white",
+                    popoverContent: "bg-black border border-white/20",
+                  }}
+                >
+                  {levels.map((level) => (
+                    <SelectItem key={level} classNames={{
+                      base: "text-white hover:bg-white/10 focus:bg-white/10",
+                    }}>
+                      {level.charAt(0).toUpperCase() + level.slice(1)}
+                    </SelectItem>
+                  ))}
+                </Select>
               </div>
-            </div>
-          )}
-
-          {/* Tracks Grid */}
-          {filteredTracks.length > 1 ? (
-            <div className="flex-shrink-0 space-y-6">
-              <h2 className="font-manrope text-xl lg:text-2xl font-bold text-gray-900 dark:text-white">
-                All Tracks
-              </h2>
               
-              <motion.div 
-                 className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6"
-                 variants={staggerContainer}
-                 initial="initial"
-                 animate="in"
-               >
-                 <AnimatePresence mode="wait">
-                   {filteredTracks.slice(1).map((track, index) => (
-                     <motion.div
-                       key={track.id}
-                       variants={staggerItem}
-                       custom={index}
-                       whileHover={hoverScale}
-                       whileTap={tapScale}
-                     >
-                       <TrackCard track={track} />
-                     </motion.div>
-                   ))}
-                 </AnimatePresence>
-               </motion.div>
-            </div>
-          ) : filteredTracks.length === 0 ? (
-            <div className="flex-shrink-0 text-center py-12">
-              <div className="text-gray-400 mb-4">
-                <Search className="h-12 w-12 mx-auto" />
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <p className="text-white/80 text-sm">
+                  {filteredTracks.length} tracks found
+                </p>
+                
+                <Select
+                  label="Sort by"
+                  selectedKeys={new Set([sortBy])}
+                  onSelectionChange={(keys) => setSortBy(Array.from(keys)[0] as string)}
+                  className="w-full sm:w-48"
+                  classNames={{
+                    trigger: "h-12 bg-black border border-white/20 hover:border-white/40 focus:border-white",
+                    label: "text-white/80",
+                    value: "text-white",
+                    selectorIcon: "text-white",
+                    popoverContent: "bg-black border border-white/20",
+                  }}
+                >
+                  <SelectItem key="popular" classNames={{
+                    base: "text-white hover:bg-white/10 focus:bg-white/10",
+                  }}>Most Popular</SelectItem>
+                  <SelectItem key="newest" classNames={{
+                    base: "text-white hover:bg-white/10 focus:bg-white/10",
+                  }}>Newest</SelectItem>
+                  <SelectItem key="duration-short" classNames={{
+                    base: "text-white hover:bg-white/10 focus:bg-white/10",
+                  }}>Shortest First</SelectItem>
+                  <SelectItem key="duration-long" classNames={{
+                    base: "text-white hover:bg-white/10 focus:bg-white/10",
+                  }}>Longest First</SelectItem>
+                </Select>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                No tracks found
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-4">
-                Try adjusting your search criteria or filters
-              </p>
-              <CustomButton
-                variant="bordered"
-                onPress={() => {
-                  setSearchQuery("");
-                  setSelectedCategory("All Categories");
-                  setSelectedLevel("All Levels");
-                }}
-              >
-                Clear Filters
-              </CustomButton>
-            </div>
-          ) : null}
+            </motion.div>
 
-          {/* CTA Section */}
-          <div className="flex-shrink-0 bg-gradient-to-r from-primary-50 to-secondary-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-6 lg:p-8 text-center">
-            <h2 className="font-manrope text-xl lg:text-2xl font-bold text-gray-900 dark:text-white mb-4">
-              Can't find the right track?
-            </h2>
-            <p className="text-gray-600 dark:text-gray-300 mb-6">
-              Browse our individual courses or suggest a new learning track
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <CustomButton
-                as={Link}
-                href="/learn"
-                color="primary"
-                rightIcon={ArrowRight}
-                className="w-full sm:w-auto"
+            {/* Featured Track */}
+            {filteredTracks.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="mb-12"
               >
-                Browse Courses
-              </CustomButton>
-              <CustomButton
-                variant="bordered"
-                onPress={() => console.log('Suggest track')}
-                className="w-full sm:w-auto"
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-white">
+                    Featured Track
+                  </h2>
+                </div>
+              
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-center">
+                  <div className="space-y-4 lg:space-y-6">
+                    <div className="space-y-3 lg:space-y-4">
+                      <div className="flex items-center gap-3">
+                        <Chip variant="bordered" size="sm" className="border-white/20 text-white bg-black">
+                          {filteredTracks[0].level.charAt(0).toUpperCase() + filteredTracks[0].level.slice(1)}
+                        </Chip>
+                        <Chip size="sm" className="bg-white text-black">
+                          {filteredTracks[0].category}
+                        </Chip>
+                      </div>
+                      
+                      <h3 className="text-2xl lg:text-3xl font-bold text-white">
+                        {filteredTracks[0].title}
+                      </h3>
+                      
+                      <p className="text-base lg:text-lg text-white/80">
+                        {filteredTracks[0].description}
+                      </p>
+                    </div>
+                  
+                    <div className="flex items-center gap-6 text-sm text-white/80">
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-white" />
+                        <span>{formatDuration(filteredTracks[0].totalDuration)}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <BookOpen className="h-4 w-4 text-white" />
+                        <span>{filteredTracks[0].courses?.length || 0} courses</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Users className="h-4 w-4 text-white" />
+                        <span>{filteredTracks[0].enrollmentCount.toLocaleString()}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <CustomButton
+                        as={Link}
+                        href={`/tracks/${filteredTracks[0].id}`}
+                        size="lg"
+                        className="bg-white text-black hover:bg-white/90 transition-all duration-200"
+                        rightIcon={ArrowRight}
+                      >
+                        Start Learning
+                      </CustomButton>
+                      <CustomButton
+                        variant="bordered"
+                        size="lg"
+                        className="border-white/20 text-white bg-black hover:bg-white hover:text-black transition-all duration-200"
+                        onPress={() => console.log('Preview track')}
+                      >
+                        Preview
+                      </CustomButton>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-6 lg:mt-0">
+                    <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl bg-black border border-white/10">
+                      <Image
+                        src={filteredTracks[0].thumbnail}
+                        alt={filteredTracks[0].title}
+                        fill
+                        className="object-cover"
+                      />
+                      
+                      {/* Play overlay */}
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                        <div className="rounded-full bg-white/90 p-6 transition-transform hover:scale-110">
+                          <Play className="h-12 w-12 text-black" fill="currentColor" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Tracks Grid */}
+            {filteredTracks.length > 1 ? (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="space-y-6"
               >
-                Suggest a Track
-              </CustomButton>
-            </div>
+                <h2 className="text-2xl font-bold text-white">
+                  All Tracks
+                </h2>
+                
+                <motion.div 
+                  className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
+                  variants={staggerContainer}
+                  initial="initial"
+                  animate="animate"
+                >
+                  {filteredTracks.slice(1).map((track, index) => (
+                    <motion.div
+                      key={track.id}
+                      variants={staggerItem}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <TrackCard track={track} />
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </motion.div>
+            ) : filteredTracks.length === 1 ? (
+              <div className="text-center py-12">
+                <p className="text-white/80 text-lg">
+                  Only one track matches your criteria. Check out the featured track above!
+                </p>
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-white/80 text-lg">
+                  No tracks found matching your criteria.
+                </p>
+                <p className="text-white/60 text-sm mt-2">
+                  Try adjusting your search or filters.
+                </p>
+              </div>
+            )}
           </div>
         </div>
-       </div>
-     </PageContainer>
-   </PageTransition>
-   );
+      </PageTransition>
+    </MainLayout>
+  );
 }
