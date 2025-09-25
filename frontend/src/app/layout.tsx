@@ -5,6 +5,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { queryClient, initializeCache } from '@/lib/query-client';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ErrorBoundary } from '@/components/providers/ErrorBoundary';
+import { RootLayoutClient } from '@/components/layouts/RootLayoutClient';
 import { useEffect } from 'react';
 import './globals.css';
 
@@ -24,7 +25,9 @@ export default function RootLayout({
         <ErrorBoundary>
           <QueryClientProvider client={queryClient}>
             <AuthProvider>
-              {children}
+              <RootLayoutClient>
+                {children}
+              </RootLayoutClient>
             </AuthProvider>
             <ReactQueryDevtools initialIsOpen={false} />
           </QueryClientProvider>

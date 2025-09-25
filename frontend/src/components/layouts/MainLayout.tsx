@@ -1,7 +1,6 @@
 "use client";
 
 import { ReactNode } from "react";
-import { FloatingBottomNav } from "@/components/molecules/FloatingBottomNav";
 import { User } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -16,34 +15,21 @@ interface MainLayoutProps {
 export function MainLayout({
   children,
   user,
-  showBottomNav = true,
-  showHeader = false, // Disable header by default for floating nav
+  showBottomNav = false, // Default to false since FloatingBottomNav is now in root layout
+  showHeader = false,
   className,
 }: MainLayoutProps) {
   return (
     <div className="min-h-screen bg-background">
-      {/* Main content - full viewport with floating nav */}
+      {/* Main content - no bottom padding needed since FloatingBottomNav is in root layout */}
       <main
         className={cn(
           "min-h-screen",
-          showBottomNav && "pb-20", // Add bottom padding for floating nav
           className
         )}
       >
         {children}
       </main>
-
-      {/* Floating Bottom Navigation */}
-      {showBottomNav && (
-        <FloatingBottomNav 
-          isAuthenticated={!!user} 
-          user={user ? {
-            name: user.name || user.email,
-            email: user.email,
-            avatar: user.avatar
-          } : undefined}
-        />
-      )}
     </div>
   );
 }

@@ -4,7 +4,6 @@ import { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { FloatingBottomNav } from "@/components/molecules/FloatingBottomNav";
 import { User as UserType } from "@/types";
 
 interface AppShellProps {
@@ -15,9 +14,6 @@ interface AppShellProps {
 
 export function AppShell({ children, user, className }: AppShellProps) {
   const pathname = usePathname();
-  
-  // Check if user is authenticated
-  const isAuthenticated = !!user;
 
   return (
     <div className="flex flex-col h-screen bg-background overflow-hidden">
@@ -34,16 +30,6 @@ export function AppShell({ children, user, className }: AppShellProps) {
           {children}
         </motion.div>
       </main>
-
-      {/* Floating Bottom Navigation */}
-      <FloatingBottomNav
-        isAuthenticated={isAuthenticated}
-        user={user ? {
-          name: user.name,
-          email: user.email,
-          avatar: user.avatar
-        } : undefined}
-      />
      </div>
    );
 }
