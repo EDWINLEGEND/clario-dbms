@@ -22,7 +22,7 @@ import { PageContainer } from "@/components/layouts/AppShell";
 import { CustomButton } from "@/components/atoms/CustomButton";
 import { LevelBadge } from "@/components/atoms/CustomBadge";
 import { CustomAvatar, AvatarGroup } from "@/components/atoms/CustomAvatar";
-import { PageTransition, staggerContainer, staggerItem, hoverScale, tapScale } from "@/components/atoms/PageTransition";
+
 import { MainLayout } from "@/components/layouts/MainLayout";
 import { Track } from "@/types";
 import { cn, formatDuration } from "@/lib/utils";
@@ -284,14 +284,10 @@ export default function TracksPage() {
 
   return (
     <MainLayout>
-      <PageTransition>
-        <div className="min-h-screen bg-black">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="min-h-screen bg-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {/* Header */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
+            <div
               className="mb-8"
             >
               <h1 className="text-3xl font-bold text-white mb-4">
@@ -300,13 +296,10 @@ export default function TracksPage() {
               <p className="text-white/80">
                 Structured learning paths to master complete skill sets
               </p>
-            </motion.div>
+            </div>
 
             {/* Search and Filters */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
+            <div
               className="mb-8"
             >
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
@@ -398,14 +391,11 @@ export default function TracksPage() {
                   }}>Longest First</SelectItem>
                 </Select>
               </div>
-            </motion.div>
+            </div>
 
             {/* Featured Track */}
             {filteredTracks.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
+              <div
                 className="mb-12"
               >
                 <div className="flex items-center justify-between mb-6">
@@ -489,39 +479,30 @@ export default function TracksPage() {
                     </div>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             )}
 
             {/* Tracks Grid */}
             {filteredTracks.length > 1 ? (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
+              <div
                 className="space-y-6"
               >
                 <h2 className="text-2xl font-bold text-white">
                   All Tracks
                 </h2>
                 
-                <motion.div 
+                <div 
                   className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
-                  variants={staggerContainer}
-                  initial="initial"
-                  animate="animate"
                 >
                   {filteredTracks.slice(1).map((track, index) => (
-                    <motion.div
+                    <div
                       key={track.id}
-                      variants={staggerItem}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
                     >
                       <TrackCard track={track} />
-                    </motion.div>
+                    </div>
                   ))}
-                </motion.div>
-              </motion.div>
+                </div>
+              </div>
             ) : filteredTracks.length === 1 ? (
               <div className="text-center py-12">
                 <p className="text-white/80 text-lg">
@@ -538,9 +519,8 @@ export default function TracksPage() {
                 </p>
               </div>
             )}
-          </div>
         </div>
-      </PageTransition>
+      </div>
     </MainLayout>
-  );
+    );
 }

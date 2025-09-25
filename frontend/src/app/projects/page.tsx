@@ -14,7 +14,6 @@ import { useProjects } from "@/hooks/useApi";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { ErrorMessage } from "@/components/ui/error-message";
 import { MainLayout } from "@/components/layouts/MainLayout";
-import { PageTransition } from "@/components/atoms/PageTransition";
 
 interface Project {
   id: string;
@@ -104,8 +103,7 @@ export default function ProjectsPage() {
 
   return (
     <MainLayout>
-      <PageTransition>
-        <div className="min-h-screen bg-black">
+      <div className="min-h-screen bg-black">
           <div className="container mx-auto px-4 py-8">
             {/* Header */}
             <div className="mb-8">
@@ -233,8 +231,7 @@ export default function ProjectsPage() {
               </>
             )}
           </div>
-        </div>
-      </PageTransition>
+      </div>
     </MainLayout>
   );
 }

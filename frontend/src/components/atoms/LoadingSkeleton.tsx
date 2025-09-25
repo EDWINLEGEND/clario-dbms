@@ -2,7 +2,6 @@
 
 import { Card, CardBody, Skeleton } from "@heroui/react";
 import { motion } from "framer-motion";
-import { loadingVariants } from "./PageTransition";
 
 interface LoadingSkeletonProps {
   variant?: "card" | "list" | "stats" | "course" | "track" | "project";
@@ -165,33 +164,17 @@ export const LoadingSkeleton = ({
   };
 
   return (
-    <motion.div
+    <div
       className={`grid gap-4 ${className}`}
-      variants={loadingVariants}
-      initial="initial"
-      animate="animate"
-      exit="exit"
     >
       {Array.from({ length: count }, (_, index) => (
-        <motion.div
+        <div
           key={index}
-          variants={{
-            initial: { opacity: 0, y: 20 },
-            animate: {
-              opacity: 1,
-              y: 0,
-              transition: {
-                delay: index * 0.1,
-                duration: 0.3,
-                ease: "easeOut",
-              },
-            },
-          }}
         >
           {renderSkeleton()}
-        </motion.div>
+        </div>
       ))}
-    </motion.div>
+    </div>
   );
 };
 
