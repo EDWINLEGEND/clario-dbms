@@ -23,6 +23,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { createPortal } from "react-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface NavItem {
   href: string;
@@ -71,6 +72,7 @@ export function FloatingBottomNav({
   const navRef = useRef<HTMLDivElement>(null);
   
   const pathname = usePathname();
+  const { logout } = useAuth();
 
   const isActive = (href: string) => {
     if (href === "/") {
@@ -141,8 +143,7 @@ export function FloatingBottomNav({
 
 
   const handleLogout = () => {
-    // Implement logout logic
-    console.log("Logout clicked");
+    logout();
     setShowProfileDropUp(false);
   };
 
@@ -251,7 +252,7 @@ export function FloatingBottomNav({
             </>
           ) : (
             <Link
-              href="/auth"
+              href="/login"
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors text-sm"
               onClick={() => setShowProfileDropUp(false)}
             >

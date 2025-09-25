@@ -2,6 +2,7 @@
 
 import { ReactNode } from "react";
 import { FloatingBottomNav } from "@/components/molecules/FloatingBottomNav";
+import { Toaster } from "@/components/ui/toaster";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface RootLayoutClientProps {
@@ -27,6 +28,9 @@ export function RootLayoutClient({ children }: RootLayoutClientProps) {
           avatar: undefined // Add avatar field to User type if needed
         } : undefined}
       />
+
+      {/* Toast notifications */}
+      <Toaster />
     </>
   );
 }

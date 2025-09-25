@@ -15,7 +15,7 @@ const globalErrorHandler = (error: unknown) => {
     // Handle specific error cases
     if (error.status === 401) {
       // Redirect to login or refresh token
-      window.location.href = '/auth';
+      window.location.href = '/login';
     } else if (error.status === 403) {
       // Show permission denied message
       console.error('Permission denied');

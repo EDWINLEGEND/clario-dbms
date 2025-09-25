@@ -97,7 +97,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setUser(null);
       localStorage.removeItem('accessToken');
       localStorage.removeItem('user');
-      router.push('/auth');
+      router.push('/login');
     }
   };
 
