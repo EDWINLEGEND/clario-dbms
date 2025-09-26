@@ -7,6 +7,8 @@
   "scripts": {
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
+    "build": "echo 'No build step required for this project'",
+    "test": "jest",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev --name init"
   },
@@ -26,15 +28,18 @@
     "googleapis": "^131.0.0",
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
-    "morgan": "^1.10.0",
+    "morgan": "^1.10.1",
     "nodemailer": "^6.9.12",
     "twilio": "^4.22.0",
     "uuid": "^9.0.1",
+    "youtube-transcript": "^1.2.1",
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "jest": "^29.7.0",
     "nodemon": "^3.1.0",
     "prisma": "^5.16.1",
+    "supertest": "^7.1.4",
     "ts-node": "^10.9.2"
   }
 }

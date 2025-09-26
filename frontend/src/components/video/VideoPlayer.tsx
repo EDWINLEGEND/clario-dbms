@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import YouTube, { YouTubeProps } from "react-youtube";
 import { CheckCircle, Clock, FileText, Loader2 } from "lucide-react";
+import { debounce } from "lodash";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Lesson } from "@/types";
 import { cn, formatDuration } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
+import { apiClient } from "@/lib/api";
 
 interface VideoPlayerProps {
   lesson: Lesson;
@@ -20,6 +22,12 @@ export function VideoPlayer({ lesson, onMarkComplete, className }: VideoPlayerPr
   const [isLoading, setIsLoading] = useState(false);
   const [isCompleting, setIsCompleting] = useState(false);
   const { accessToken } = useAuth();
+  
+  // Video progress tracking state
+  const playerRef = useRef<any>(null);
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const lastProgressUpdateRef = useRef<number>(0);
+  const isPlayingRef = useRef<boolean>(false);
 
   // Extract YouTube video ID from URL
   const getYouTubeVideoId = (url: string): string | null => {
@@ -29,6 +37,80 @@ export function VideoPlayer({ lesson, onMarkComplete, className }: VideoPlayerPr
   };
 
   const videoId = lesson.videoUrl ? getYouTubeVideoId(lesson.videoUrl) : null;
+
+  // Debounced function to send progress to backend
+  const debouncedProgressUpdate = useCallback(
+    debounce(async (videoId: string, percentWatched: number) => {
+      if (!accessToken) return;
+      
+      try {
+        await apiClient.post('/history', {
+          videoId: videoId,
+          percentWatched: percentWatched
+        }, accessToken);
+        
+        console.log(`Progress updated: ${percentWatched}% for video ${videoId}`);
+      } catch (error) {
+        console.error('Failed to update video progress:', error);
+      }
+    }, 2000), // 2 second debounce
+    [accessToken]
+  );
+
+  // Function to track video progress
+  const trackProgress = useCallback(() => {
+    if (!playerRef.current || !videoId || !accessToken) return;
+
+    try {
+      const currentTime = playerRef.current.getCurrentTime();
+      const duration = playerRef.current.getDuration();
+      
+      if (duration > 0) {
+        const percentWatched = Math.round((currentTime / duration) * 100);
+        
+        // Only update if progress has changed by at least 5% or 30 seconds have passed
+        const timeSinceLastUpdate = Date.now() - lastProgressUpdateRef.current;
+        const shouldUpdate = 
+          percentWatched > 0 && 
+          (percentWatched % 5 === 0 || timeSinceLastUpdate > 30000);
+        
+        if (shouldUpdate) {
+          debouncedProgressUpdate(videoId, percentWatched);
+          lastProgressUpdateRef.current = Date.now();
+        }
+      }
+    } catch (error) {
+      console.error('Error tracking video progress:', error);
+    }
+  }, [videoId, accessToken, debouncedProgressUpdate]);
+
+  // Start progress tracking interval
+  const startProgressTracking = useCallback(() => {
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+    }
+    
+    progressIntervalRef.current = setInterval(() => {
+      if (isPlayingRef.current) {
+        trackProgress();
+      }
+    }, 15000); // Track every 15 seconds when playing
+  }, [trackProgress]);
+
+  // Stop progress tracking interval
+  const stopProgressTracking = useCallback(() => {
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+      progressIntervalRef.current = null;
+    }
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      stopProgressTracking();
+    };
+  }, [stopProgressTracking]);
 
   const handleMarkComplete = async () => {
     if (!onMarkComplete || lesson.isCompleted) return;
@@ -58,14 +140,41 @@ export function VideoPlayer({ lesson, onMarkComplete, className }: VideoPlayerPr
 
   const onReady: YouTubeProps['onReady'] = (event) => {
     setIsLoading(false);
+    playerRef.current = event.target;
   };
 
   const onStateChange: YouTubeProps['onStateChange'] = (event) => {
-    // You can add logic here to track video progress
-    // event.data === 0 means video ended
-    if (event.data === 0 && !lesson.isCompleted) {
-      // Optionally auto-mark as complete when video ends
-      // handleMarkComplete();
+    // YouTube player states:
+    // -1 (unstarted), 0 (ended), 1 (playing), 2 (paused), 3 (buffering), 5 (video cued)
+    
+    switch (event.data) {
+      case 1: // Playing
+        isPlayingRef.current = true;
+        startProgressTracking();
+        break;
+      case 2: // Paused
+      case 0: // Ended
+        isPlayingRef.current = false;
+        stopProgressTracking();
+        
+        // Track final progress when video ends or is paused
+        if (event.data === 0 || event.data === 2) {
+          trackProgress();
+        }
+        
+        // Auto-mark as complete when video ends
+        if (event.data === 0 && !lesson.isCompleted) {
+          // Send 100% completion to backend
+          if (videoId && accessToken) {
+            debouncedProgressUpdate(videoId, 100);
+          }
+          // Optionally auto-mark lesson as complete
+          // handleMarkComplete();
+        }
+        break;
+      default:
+        isPlayingRef.current = false;
+        break;
     }
   };
 

@@ -94,7 +94,7 @@ export interface Question {
 export interface Resource {
   id: string;
   title: string;
-  type: 'pdf' | 'link' | 'code' | 'image';
+  type: 'pdf' | 'link' | 'code' | 'image' | 'documentation';
   url: string;
   description?: string;
 }
@@ -225,6 +225,22 @@ export interface VideoDetail {
   tags: string[];
 }
 
+// Video History interface for dashboard
+export interface VideoHistory {
+  id: string;
+  videoId: string;
+  percentWatched: number;
+  watchedAt: string;
+  updatedAt: string;
+  video: {
+    id: string;
+    title: string;
+    description?: string;
+    thumbnailUrl?: string;
+    duration?: number;
+  };
+}
+
 // API Response types
 export interface ApiResponse<T> {
   data: T;
@@ -232,3 +248,5 @@ export interface ApiResponse<T> {
   message?: string;
   success: boolean;
 }
+
+export type VideoHistoryResponse = ApiResponse<VideoHistory[]>;

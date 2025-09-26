@@ -19,6 +19,7 @@ import {
   Settings,
   LogOut,
   X,
+  LayoutDashboard,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -47,18 +48,10 @@ interface SearchResult {
 }
 
 interface FloatingBottomNavProps {
-  isAuthenticated?: boolean;
-  user?: {
-    name: string;
-    email: string;
-    avatar?: string;
-  };
   className?: string;
 }
 
 export function FloatingBottomNav({
-  isAuthenticated = false,
-  user,
   className,
 }: FloatingBottomNavProps) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -72,7 +65,7 @@ export function FloatingBottomNav({
   const navRef = useRef<HTMLDivElement>(null);
   
   const pathname = usePathname();
-  const { logout } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
 
   const isActive = (href: string) => {
     if (href === "/") {
@@ -227,6 +220,14 @@ export function FloatingBottomNav({
                 <div className="text-xs text-gray-500 dark:text-gray-400">{user.email}</div>
               </div>
               <Link
+                href="/dashboard"
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors text-sm"
+                onClick={() => setShowProfileDropUp(false)}
+              >
+                <LayoutDashboard className="h-4 w-4" />
+                Dashboard
+              </Link>
+              <Link
                 href="/profile"
                 className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors text-sm"
                 onClick={() => setShowProfileDropUp(false)}
@@ -332,6 +333,7 @@ export function FloatingBottomNav({
               variant="light"
               onClick={() => setShowProfileDropUp(!showProfileDropUp)}
               className="rounded-full h-10 w-10 min-w-10 text-white hover:bg-gray-700"
+              data-cy="profile-avatar-button"
             >
               {isAuthenticated && user?.avatar ? (
                 <Avatar
@@ -418,6 +420,7 @@ export function FloatingBottomNav({
               variant="light"
               onClick={() => setShowProfileDropUp(!showProfileDropUp)}
               className="rounded-full h-10 w-10 min-w-10 text-white hover:bg-gray-700"
+              data-cy="profile-avatar-button"
             >
               {isAuthenticated && user?.avatar ? (
                 <Avatar

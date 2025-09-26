@@ -1,20 +1,42 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
-import { Search, SlidersHorizontal, Loader2 } from "lucide-react";
-import { motion } from "framer-motion";
+import { useState, useCallback, useEffect, useMemo } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { 
+  Search, 
+  SlidersHorizontal, 
+  Loader2, 
+  BookOpen, 
+  Clock, 
+  Users, 
+  Star,
+  Filter,
+  ChevronDown,
+  ChevronUp
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CourseCard } from "@/components/cards/CourseCard";
-import { Course } from "@/types";
-import { debounce } from "@/lib/utils";
-import { useAuth } from "@/contexts/AuthContext";
-import { useVideos } from "@/hooks/useApi";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
-import { ErrorMessage } from "@/components/ui/error-message";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { MainLayout } from "@/components/layouts/MainLayout";
+import { CourseCard } from "@/components/molecules/CourseCard";
+import { useAuth } from "@/contexts/AuthContext";
+import { Course } from "@/types";
+import { debounce } from "lodash";
 
 import { VideoSearchResult, VideoSearchResponse } from "@/types";
 import { videoApi, handleApiError, retryApiCall } from "@/lib/api";
@@ -225,7 +247,9 @@ export default function LearnPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [selectedLevel, setSelectedLevel] = useState("All Levels");
+  const [sortBy, setSortBy] = useState("most-relevant");
   const [showFilters, setShowFilters] = useState(false);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -317,64 +341,132 @@ export default function LearnPage() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="mb-8"
           >
-            <div className="flex flex-col lg:flex-row gap-4 mb-4">
-              {/* Search Bar */}
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 h-4 w-4" />
-                <Input
-                  placeholder={accessToken 
-                    ? "Search for videos, topics, or skills..." 
-                    : "Sign in to search personalized video content..."
-                  }
-                  className="pl-10 h-12 bg-black border-white/20 text-white placeholder:text-white/60 focus:border-white focus:ring-white"
-                  onChange={(e) => debouncedSearch(e.target.value)}
-                  disabled={!accessToken}
-                />
-                {loading && (
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                    <Loader2 className="h-4 w-4 animate-spin text-white/60" />
-                  </div>
-                )}
+            {/* Search Bar - Always Visible */}
+            <div className="flex flex-col gap-4 mb-4">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 h-4 w-4" />
+                  <Input
+                    placeholder={accessToken 
+                      ? "Search for videos, topics, or skills..." 
+                      : "Sign in to search personalized video content..."
+                    }
+                    className="pl-10 h-12 bg-black border-white/20 text-white placeholder:text-white/60 focus:border-white focus:ring-white"
+                    onChange={(e) => debouncedSearch(e.target.value)}
+                    disabled={!accessToken}
+                  />
+                  {loading && (
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                      <Loader2 className="h-4 w-4 animate-spin text-white/60" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Mobile Filter Toggle */}
+                <div className="sm:hidden">
+                  <Collapsible open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
+                    <CollapsibleTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="w-full h-12 bg-black border-white/20 text-white hover:bg-white/10"
+                      >
+                        <Filter className="h-4 w-4 mr-2" />
+                        Show Filters
+                        {isFiltersOpen ? (
+                          <ChevronUp className="h-4 w-4 ml-2" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4 ml-2" />
+                        )}
+                      </Button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="space-y-4 mt-4">
+                      {/* Mobile Filters */}
+                      <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                        <SelectTrigger className="w-full h-12 bg-black border-white/20 text-white focus:border-white focus:ring-white">
+                          <SelectValue placeholder="Category" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-black border-white/20">
+                          {categories.map((category) => (
+                            <SelectItem key={category} value={category} className="text-white hover:bg-white/10 focus:bg-white/10">
+                              {category}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+
+                      <Select value={selectedLevel} onValueChange={setSelectedLevel}>
+                        <SelectTrigger className="w-full h-12 bg-black border-white/20 text-white focus:border-white focus:ring-white">
+                          <SelectValue placeholder="Level" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-black border-white/20">
+                          {levels.map((level) => (
+                            <SelectItem key={level} value={level} className="text-white hover:bg-white/10 focus:bg-white/10">
+                              {level === "All Levels" ? level : level.charAt(0).toUpperCase() + level.slice(1)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+
+                      <Select value={sortBy} onValueChange={setSortBy}>
+                        <SelectTrigger className="w-full h-12 bg-black border-white/20 text-white focus:border-white focus:ring-white">
+                          <SelectValue placeholder="Sort by" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-black border-white/20">
+                          <SelectItem value="most-relevant" className="text-white hover:bg-white/10 focus:bg-white/10">
+                            Most Relevant
+                          </SelectItem>
+                          <SelectItem value="newest" className="text-white hover:bg-white/10 focus:bg-white/10">
+                            Newest
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </CollapsibleContent>
+                  </Collapsible>
+                </div>
               </div>
 
-              {/* Category Filter */}
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger className="w-full lg:w-48 h-12 bg-black border-white/20 text-white focus:border-white focus:ring-white">
-                  <SelectValue placeholder="Category" />
-                </SelectTrigger>
-                <SelectContent className="bg-black border-white/20">
-                  {categories.map((category) => (
-                    <SelectItem key={category} value={category} className="text-white hover:bg-white/10 focus:bg-white/10">
-                      {category}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {/* Desktop Filters - Always Visible on Large Screens */}
+              <div className="hidden sm:flex gap-4">
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger className="w-48 h-12 bg-black border-white/20 text-white focus:border-white focus:ring-white">
+                    <SelectValue placeholder="Category" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-black border-white/20">
+                    {categories.map((category) => (
+                      <SelectItem key={category} value={category} className="text-white hover:bg-white/10 focus:bg-white/10">
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-              {/* Level Filter */}
-              <Select value={selectedLevel} onValueChange={setSelectedLevel}>
-                <SelectTrigger className="w-full lg:w-48 h-12 bg-black border-white/20 text-white focus:border-white focus:ring-white">
-                  <SelectValue placeholder="Level" />
-                </SelectTrigger>
-                <SelectContent className="bg-black border-white/20">
-                  {levels.map((level) => (
-                    <SelectItem key={level} value={level} className="text-white hover:bg-white/10 focus:bg-white/10">
-                      {level === "All Levels" ? level : level.charAt(0).toUpperCase() + level.slice(1)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                <Select value={selectedLevel} onValueChange={setSelectedLevel}>
+                  <SelectTrigger className="w-48 h-12 bg-black border-white/20 text-white focus:border-white focus:ring-white">
+                    <SelectValue placeholder="Level" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-black border-white/20">
+                    {levels.map((level) => (
+                      <SelectItem key={level} value={level} className="text-white hover:bg-white/10 focus:bg-white/10">
+                        {level === "All Levels" ? level : level.charAt(0).toUpperCase() + level.slice(1)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-              {/* Filter Toggle Button */}
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={() => setShowFilters(!showFilters)}
-                className="h-12 px-4 bg-black border-white/20 text-white hover:bg-white/10"
-              >
-                <SlidersHorizontal className="h-4 w-4 mr-2" />
-                Filters
-              </Button>
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="w-48 h-12 bg-black border-white/20 text-white focus:border-white focus:ring-white">
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-black border-white/20">
+                    <SelectItem value="most-relevant" className="text-white hover:bg-white/10 focus:bg-white/10">
+                      Most Relevant
+                    </SelectItem>
+                    <SelectItem value="newest" className="text-white hover:bg-white/10 focus:bg-white/10">
+                      Newest
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             {/* Results Count and Error Display */}
@@ -406,15 +498,15 @@ export default function LearnPage() {
             {loading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[...Array(6)].map((_, index) => (
-                  <Card key={index} className="animate-pulse bg-black border-white/10">
+                  <Card key={index} className="bg-black border-white/10">
                     <CardHeader>
-                      <div className="h-4 bg-white/20 rounded w-3/4 mb-2"></div>
-                      <div className="h-3 bg-white/20 rounded w-1/2"></div>
+                      <Skeleton className="h-4 w-3/4 mb-2 bg-white/20" />
+                      <Skeleton className="h-3 w-1/2 bg-white/20" />
                     </CardHeader>
                     <CardContent>
-                      <div className="aspect-video bg-white/20 rounded mb-4"></div>
-                      <div className="h-3 bg-white/20 rounded w-full mb-2"></div>
-                      <div className="h-3 bg-white/20 rounded w-2/3"></div>
+                      <Skeleton className="aspect-video w-full mb-4 bg-white/20" />
+                      <Skeleton className="h-3 w-full mb-2 bg-white/20" />
+                      <Skeleton className="h-3 w-2/3 bg-white/20" />
                     </CardContent>
                   </Card>
                 ))}

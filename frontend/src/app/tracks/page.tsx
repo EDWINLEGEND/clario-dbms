@@ -15,9 +15,15 @@ import {
   Select,
   SelectItem,
 } from "@heroui/react";
-import { Search, Clock, BookOpen, Users, Star, ArrowRight, Play } from "lucide-react";
+import { Search, Clock, BookOpen, Users, Star, ArrowRight, Play, Filter, ChevronDown, ChevronUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { PageContainer } from "@/components/layouts/AppShell";
 import { CustomButton } from "@/components/atoms/CustomButton";
 import { LevelBadge } from "@/components/atoms/CustomBadge";
@@ -249,16 +255,18 @@ function TrackCard({ track, progress, showProgress = false }: TrackCardProps) {
 }
 
 export default function TracksPage() {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [selectedLevel, setSelectedLevel] = useState("All Levels");
-  const [sortBy, setSortBy] = useState("popular");
+  const [sortBy, setSortBy] = useState("most-popular");
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Filter tracks based on search and filters
   const filteredTracks = mockTracks.filter(track => {
-    const matchesSearch = !searchQuery || 
-      track.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      track.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = !searchTerm || 
+      track.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      track.description.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesCategory = selectedCategory === "All Categories" || 
       track.category === selectedCategory;
@@ -269,7 +277,7 @@ export default function TracksPage() {
     return matchesSearch && matchesCategory && matchesLevel;
   }).sort((a, b) => {
     switch (sortBy) {
-      case "popular":
+      case "most-popular":
         return b.enrollmentCount - a.enrollmentCount;
       case "newest":
         return b.createdAt.getTime() - a.createdAt.getTime();
@@ -302,94 +310,205 @@ export default function TracksPage() {
             <div
               className="mb-8"
             >
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                <div className="md:col-span-2">
-                  <Input
-                    placeholder="Search tracks..."
-                    startContent={<Search className="h-4 w-4 text-white/60" />}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    classNames={{
-                      inputWrapper: "h-12 bg-black border border-white/20 hover:border-white/40 focus-within:border-white",
-                      input: "text-white placeholder:text-white/60",
-                    }}
-                  />
+              {/* Search Bar - Always Visible */}
+              <div className="flex flex-col gap-4 mb-4">
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex-1">
+                    <Input
+                      placeholder="Search tracks..."
+                      startContent={<Search className="h-4 w-4 text-white/60" />}
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      classNames={{
+                        inputWrapper: "h-12 bg-black border border-white/20 hover:border-white/40 focus-within:border-white",
+                        input: "text-white placeholder:text-white/60",
+                      }}
+                    />
+                  </div>
+
+                  {/* Mobile Filter Toggle */}
+                  <div className="sm:hidden">
+                    <Collapsible open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
+                      <CollapsibleTrigger asChild>
+                        <Button
+                          variant="bordered"
+                          className="w-full h-12 bg-black border-white/20 text-white hover:bg-white/10"
+                        >
+                          <Filter className="h-4 w-4 mr-2" />
+                          Show Filters
+                          {isFiltersOpen ? (
+                            <ChevronUp className="h-4 w-4 ml-2" />
+                          ) : (
+                            <ChevronDown className="h-4 w-4 ml-2" />
+                          )}
+                        </Button>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="space-y-4 mt-4">
+                        {/* Mobile Filters */}
+                        <Select
+                          label="Category"
+                          selectedKeys={new Set([selectedCategory])}
+                          onSelectionChange={(keys) => setSelectedCategory(Array.from(keys)[0] as string)}
+                          classNames={{
+                            trigger: "h-12 bg-black border border-white/20 hover:border-white/40 focus:border-white",
+                            label: "text-white/80",
+                            value: "text-white",
+                            selectorIcon: "text-white",
+                            popoverContent: "bg-black border border-white/20",
+                          }}
+                        >
+                          {categories.map((category) => (
+                            <SelectItem key={category} classNames={{
+                              base: "text-white hover:bg-white/10 focus:bg-white/10",
+                            }}>
+                              {category}
+                            </SelectItem>
+                          ))}
+                        </Select>
+                        
+                        <Select
+                          label="Level"
+                          selectedKeys={new Set([selectedLevel])}
+                          onSelectionChange={(keys) => setSelectedLevel(Array.from(keys)[0] as string)}
+                          classNames={{
+                            trigger: "h-12 bg-black border border-white/20 hover:border-white/40 focus:border-white",
+                            label: "text-white/80",
+                            value: "text-white",
+                            selectorIcon: "text-white",
+                            popoverContent: "bg-black border border-white/20",
+                          }}
+                        >
+                          {levels.map((level) => (
+                            <SelectItem key={level} classNames={{
+                              base: "text-white hover:bg-white/10 focus:bg-white/10",
+                            }}>
+                              {level.charAt(0).toUpperCase() + level.slice(1)}
+                            </SelectItem>
+                          ))}
+                        </Select>
+
+                        <Select
+                          label="Sort by"
+                          selectedKeys={new Set([sortBy])}
+                          onSelectionChange={(keys) => setSortBy(Array.from(keys)[0] as string)}
+                          classNames={{
+                            trigger: "h-12 bg-black border border-white/20 hover:border-white/40 focus:border-white",
+                            label: "text-white/80",
+                            value: "text-white",
+                            selectorIcon: "text-white",
+                            popoverContent: "bg-black border border-white/20",
+                          }}
+                        >
+                          <SelectItem key="popular" classNames={{
+                            base: "text-white hover:bg-white/10 focus:bg-white/10",
+                          }}>
+                            Most Popular
+                          </SelectItem>
+                          <SelectItem key="newest" classNames={{
+                            base: "text-white hover:bg-white/10 focus:bg-white/10",
+                          }}>
+                            Newest
+                          </SelectItem>
+                          <SelectItem key="duration-short" classNames={{
+                            base: "text-white hover:bg-white/10 focus:bg-white/10",
+                          }}>
+                            Shortest Duration
+                          </SelectItem>
+                          <SelectItem key="duration-long" classNames={{
+                            base: "text-white hover:bg-white/10 focus:bg-white/10",
+                          }}>
+                            Longest Duration
+                          </SelectItem>
+                        </Select>
+                      </CollapsibleContent>
+                    </Collapsible>
+                  </div>
                 </div>
-                
-                <Select
-                  label="Category"
-                  selectedKeys={new Set([selectedCategory])}
-                  onSelectionChange={(keys) => setSelectedCategory(Array.from(keys)[0] as string)}
-                  classNames={{
-                    trigger: "h-12 bg-black border border-white/20 hover:border-white/40 focus:border-white",
-                    label: "text-white/80",
-                    value: "text-white",
-                    selectorIcon: "text-white",
-                    popoverContent: "bg-black border border-white/20",
-                  }}
-                >
-                  {categories.map((category) => (
-                    <SelectItem key={category} classNames={{
+
+                {/* Desktop Filters - Always Visible on Large Screens */}
+                <div className="hidden sm:grid sm:grid-cols-3 gap-4">
+                  <Select
+                    label="Category"
+                    selectedKeys={new Set([selectedCategory])}
+                    onSelectionChange={(keys) => setSelectedCategory(Array.from(keys)[0] as string)}
+                    classNames={{
+                      trigger: "h-12 bg-black border border-white/20 hover:border-white/40 focus:border-white",
+                      label: "text-white/80",
+                      value: "text-white",
+                      selectorIcon: "text-white",
+                      popoverContent: "bg-black border border-white/20",
+                    }}
+                  >
+                    {categories.map((category) => (
+                      <SelectItem key={category} classNames={{
+                        base: "text-white hover:bg-white/10 focus:bg-white/10",
+                      }}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                  
+                  <Select
+                    label="Level"
+                    selectedKeys={new Set([selectedLevel])}
+                    onSelectionChange={(keys) => setSelectedLevel(Array.from(keys)[0] as string)}
+                    classNames={{
+                      trigger: "h-12 bg-black border border-white/20 hover:border-white/40 focus:border-white",
+                      label: "text-white/80",
+                      value: "text-white",
+                      selectorIcon: "text-white",
+                      popoverContent: "bg-black border border-white/20",
+                    }}
+                  >
+                    {levels.map((level) => (
+                      <SelectItem key={level} classNames={{
+                        base: "text-white hover:bg-white/10 focus:bg-white/10",
+                      }}>
+                        {level.charAt(0).toUpperCase() + level.slice(1)}
+                      </SelectItem>
+                    ))}
+                  </Select>
+
+                  <Select
+                    label="Sort by"
+                    selectedKeys={new Set([sortBy])}
+                    onSelectionChange={(keys) => setSortBy(Array.from(keys)[0] as string)}
+                    classNames={{
+                      trigger: "h-12 bg-black border border-white/20 hover:border-white/40 focus:border-white",
+                      label: "text-white/80",
+                      value: "text-white",
+                      selectorIcon: "text-white",
+                      popoverContent: "bg-black border border-white/20",
+                    }}
+                  >
+                    <SelectItem key="popular" classNames={{
                       base: "text-white hover:bg-white/10 focus:bg-white/10",
                     }}>
-                      {category}
+                      Most Popular
                     </SelectItem>
-                  ))}
-                </Select>
-                
-                <Select
-                  label="Level"
-                  selectedKeys={new Set([selectedLevel])}
-                  onSelectionChange={(keys) => setSelectedLevel(Array.from(keys)[0] as string)}
-                  classNames={{
-                    trigger: "h-12 bg-black border border-white/20 hover:border-white/40 focus:border-white",
-                    label: "text-white/80",
-                    value: "text-white",
-                    selectorIcon: "text-white",
-                    popoverContent: "bg-black border border-white/20",
-                  }}
-                >
-                  {levels.map((level) => (
-                    <SelectItem key={level} classNames={{
+                    <SelectItem key="newest" classNames={{
                       base: "text-white hover:bg-white/10 focus:bg-white/10",
                     }}>
-                      {level.charAt(0).toUpperCase() + level.slice(1)}
+                      Newest
                     </SelectItem>
-                  ))}
-                </Select>
+                    <SelectItem key="duration-short" classNames={{
+                      base: "text-white hover:bg-white/10 focus:bg-white/10",
+                    }}>
+                      Shortest Duration
+                    </SelectItem>
+                    <SelectItem key="duration-long" classNames={{
+                      base: "text-white hover:bg-white/10 focus:bg-white/10",
+                    }}>
+                      Longest Duration
+                    </SelectItem>
+                  </Select>
+                </div>
               </div>
               
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <p className="text-white/80 text-sm">
                   {filteredTracks.length} tracks found
                 </p>
-                
-                <Select
-                  label="Sort by"
-                  selectedKeys={new Set([sortBy])}
-                  onSelectionChange={(keys) => setSortBy(Array.from(keys)[0] as string)}
-                  className="w-full sm:w-48"
-                  classNames={{
-                    trigger: "h-12 bg-black border border-white/20 hover:border-white/40 focus:border-white",
-                    label: "text-white/80",
-                    value: "text-white",
-                    selectorIcon: "text-white",
-                    popoverContent: "bg-black border border-white/20",
-                  }}
-                >
-                  <SelectItem key="popular" classNames={{
-                    base: "text-white hover:bg-white/10 focus:bg-white/10",
-                  }}>Most Popular</SelectItem>
-                  <SelectItem key="newest" classNames={{
-                    base: "text-white hover:bg-white/10 focus:bg-white/10",
-                  }}>Newest</SelectItem>
-                  <SelectItem key="duration-short" classNames={{
-                    base: "text-white hover:bg-white/10 focus:bg-white/10",
-                  }}>Shortest First</SelectItem>
-                  <SelectItem key="duration-long" classNames={{
-                    base: "text-white hover:bg-white/10 focus:bg-white/10",
-                  }}>Longest First</SelectItem>
-                </Select>
               </div>
             </div>
 
@@ -483,7 +602,60 @@ export default function TracksPage() {
             )}
 
             {/* Tracks Grid */}
-            {filteredTracks.length > 1 ? (
+            {isLoading ? (
+              <div className="space-y-6">
+                {/* Featured Track Skeleton */}
+                <div className="mb-12">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-2">
+                        <Skeleton className="h-6 w-20 bg-white/20" />
+                        <Skeleton className="h-6 w-24 bg-white/20" />
+                      </div>
+                      <Skeleton className="h-8 w-3/4 bg-white/20" />
+                      <Skeleton className="h-4 w-full bg-white/20" />
+                      <Skeleton className="h-4 w-2/3 bg-white/20" />
+                      <div className="flex items-center gap-4">
+                        <Skeleton className="h-4 w-20 bg-white/20" />
+                        <Skeleton className="h-4 w-16 bg-white/20" />
+                        <Skeleton className="h-4 w-24 bg-white/20" />
+                      </div>
+                      <Skeleton className="h-12 w-32 bg-white/20" />
+                    </div>
+                    <div className="mt-6 lg:mt-0">
+                      <Skeleton className="aspect-[16/9] w-full bg-white/20" />
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Tracks Grid Skeleton */}
+                <div className="space-y-6">
+                  <Skeleton className="h-8 w-48 bg-white/20" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {[...Array(6)].map((_, index) => (
+                      <Card key={index} className="bg-black border-white/10">
+                        <CardBody className="p-0">
+                          <Skeleton className="aspect-video w-full bg-white/20" />
+                          <div className="p-6 space-y-4">
+                            <div className="flex items-center gap-2">
+                              <Skeleton className="h-5 w-16 bg-white/20" />
+                              <Skeleton className="h-5 w-20 bg-white/20" />
+                            </div>
+                            <Skeleton className="h-6 w-3/4 bg-white/20" />
+                            <Skeleton className="h-4 w-full bg-white/20" />
+                            <Skeleton className="h-4 w-2/3 bg-white/20" />
+                            <div className="flex items-center justify-between">
+                              <Skeleton className="h-4 w-20 bg-white/20" />
+                              <Skeleton className="h-4 w-16 bg-white/20" />
+                            </div>
+                          </div>
+                        </CardBody>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : filteredTracks.length > 1 ? (
               <div
                 className="space-y-6"
               >

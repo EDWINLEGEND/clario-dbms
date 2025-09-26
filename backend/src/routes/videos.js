@@ -3,6 +3,8 @@ import { google } from "googleapis";
 import { config } from "../config/env.js";
 import { prisma } from "../config/prisma.js";
 import { requireAuth } from "../middleware/auth.js";
+import { getYouTubeTranscript } from '../services/youtubeService.js';
+import { calculateAndSaveScores } from '../services/scoringService.js';
 
 const router = Router();
 
@@ -216,6 +218,59 @@ router.get("/:id", async (req, res) => {
     res.status(500).json({
       error: 'Internal server error while fetching video details'
     });
+  }
+});
+
+// POST /videos/process - Process a YouTube video (fetch transcript and save to database)
+router.post('/process', requireAuth, async (req, res) => {
+  const { videoId, title, description } = req.body;
+
+  if (!videoId) {
+    return res.status(400).json({ error: 'Video ID is required' });
+  }
+
+  try {
+    const transcript = await getYouTubeTranscript(videoId);
+
+    // Check if video already exists by title, if not create new one
+    let video;
+    const existingVideo = await prisma.video.findFirst({
+      where: { title: title || 'Untitled' }
+    });
+
+    if (existingVideo) {
+      // Update existing video
+      video = await prisma.video.update({
+        where: { id: existingVideo.id },
+        data: {
+          description: description || '',
+          transcript: transcript || ""
+        }
+      });
+    } else {
+      // Create new video
+      video = await prisma.video.create({
+        data: {
+          title: title || 'Untitled',
+          description: description || '',
+          transcript: transcript || ""
+        }
+      });
+    }
+
+    // Calculate and save compatibility scores based on transcript
+    try {
+      await calculateAndSaveScores(video.id);
+      console.log(`✅ Compatibility scores calculated for video: ${video.title}`);
+    } catch (scoringError) {
+      console.error('Error calculating compatibility scores:', scoringError);
+      // Don't fail the entire request if scoring fails
+    }
+
+    res.status(200).json(video);
+  } catch (error) {
+    console.error('Error processing video:', error);
+    res.status(500).json({ error: 'Failed to process video' });
   }
 });
 

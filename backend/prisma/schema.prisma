@@ -143,17 +143,19 @@ model AccountabilityFee {
 
 // CHANGED: Added UserVideoHistory model as referenced in the instructions
 model UserVideoHistory {
-  id        Int                @id @default(autoincrement())
-  userId    Int
-  videoId   Int
-  status    VideoHistoryStatus @default(STARTED)
-  watchedAt DateTime           @default(now())
-  completedAt DateTime?
+  id            Int                @id @default(autoincrement())
+  userId        Int
+  videoId       Int
+  percentWatched Float             @default(0) // CHANGED: Added percentWatched field (0-100)
+  status        VideoHistoryStatus @default(STARTED)
+  watchedAt     DateTime           @default(now())
+  completedAt   DateTime?
+  updatedAt     DateTime           @updatedAt // CHANGED: Added updatedAt for tracking progress updates
 
-  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  video     Video              @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  video         Video              @relation(fields: [videoId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, videoId]) // CHANGED: Ensure one history record per user per video
+  @@unique([userId, videoId], name: "userId_videoId") // CHANGED: Named the unique constraint for upsert
   @@index([userId]) // CHANGED: Added index on foreign key
   @@index([videoId]) // CHANGED: Added index on foreign key
   @@index([status]) // CHANGED: Added index on status field for filtering

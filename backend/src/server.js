@@ -11,6 +11,7 @@ import projectsRoutes from "./routes/projects.js";
 import milestonesRoutes from "./routes/milestones.js";
 import feesRoutes from "./routes/fees.js";
 import remindersRoutes from "./routes/reminders.js";
+import historyRoutes from "./routes/history.js";
 
 const app = express();
 app.set("trust proxy", 1);
@@ -28,7 +29,8 @@ app.use(
 );
 app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
-app.use(morgan("dev"));
+// Use combined format for production-ready logging
+app.use(morgan("combined"));
 
 app.get("/health", (req, res) => res.json({ ok: true }));
 
@@ -39,6 +41,7 @@ app.use("/projects", projectsRoutes);
 app.use("/milestones", milestonesRoutes);
 app.use("/fees", feesRoutes);
 app.use("/reminders", remindersRoutes);
+app.use("/history", historyRoutes);
 
 app.use((err, req, res, next) => {
   if (err?.message === "CORS not allowed") {

@@ -42,11 +42,6 @@ router.get("/", requireAuth, async (req, res) => {
 
     const projects = await prisma.project.findMany({
       where: { userId },
-      include: {
-        milestones: {
-          orderBy: { createdAt: 'asc' }
-        },
-      },
       orderBy: { createdAt: 'desc' },
     });
 
@@ -69,11 +64,6 @@ router.get("/:id", requireAuth, async (req, res) => {
 
     const project = await prisma.project.findUnique({
       where: { id: projectId },
-      include: {
-        milestones: {
-          orderBy: { createdAt: 'asc' }
-        },
-      },
     });
 
     if (!project) {
@@ -127,11 +117,6 @@ router.patch("/:id", requireAuth, async (req, res) => {
     const updatedProject = await prisma.project.update({
       where: { id: projectId },
       data: updateData,
-      include: {
-        milestones: {
-          orderBy: { createdAt: 'asc' }
-        },
-      },
     });
 
     res.json(updatedProject);

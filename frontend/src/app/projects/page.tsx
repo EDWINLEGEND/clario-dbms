@@ -5,8 +5,10 @@ import { motion } from "framer-motion";
 import { Plus, Search, Filter, Loader2, FolderOpen, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent } from "@/components/ui/card";
 import { ProjectCard } from "@/components/cards/ProjectCard";
 import { CreateProjectForm } from "@/components/forms/CreateProjectForm";
 import { useAuth } from "@/contexts/AuthContext";
@@ -29,6 +31,7 @@ interface Project {
 export default function ProjectsPage() {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState("newest");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   // Use React Query hook for data fetching
@@ -39,11 +42,30 @@ export default function ProjectsPage() {
     refetch: fetchProjects 
   } = useProjects();
 
-  // Filter projects based on search query
-  const filteredProjects = projects.filter((project) =>
-    project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (project.description && project.description.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  // Filter and sort projects based on search query and sort option
+  const filteredAndSortedProjects = projects
+    .filter((project) =>
+      project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (project.description && project.description.toLowerCase().includes(searchTerm.toLowerCase()))
+    )
+    .sort((a, b) => {
+      switch (sortBy) {
+        case "newest":
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        case "oldest":
+          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        case "priority":
+          const priorityOrder = { high: 3, medium: 2, low: 1 };
+          return priorityOrder[b.priority] - priorityOrder[a.priority];
+        case "status":
+          const statusOrder = { active: 3, "on-hold": 2, completed: 1 };
+          return statusOrder[b.status] - statusOrder[a.status];
+        case "alphabetical":
+          return a.title.localeCompare(b.title);
+        default:
+          return 0;
+      }
+    });
 
   // Handle successful project creation
   const handleProjectCreated = () => {
@@ -53,16 +75,22 @@ export default function ProjectsPage() {
 
   // Loading skeleton component
   const ProjectSkeleton = () => (
-    <div className="border-2 border-gray-200 rounded-lg p-6 bg-white">
-      <Skeleton className="h-48 w-full mb-4" />
-      <Skeleton className="h-6 w-3/4 mb-2" />
-      <Skeleton className="h-4 w-full mb-4" />
-      <div className="flex gap-2 mb-4">
-        <Skeleton className="h-6 w-16" />
-        <Skeleton className="h-6 w-20" />
-      </div>
-      <Skeleton className="h-10 w-32" />
-    </div>
+    <Card className="bg-black border-white/10">
+      <CardContent className="p-6 space-y-4">
+        <Skeleton className="h-48 w-full bg-white/20" />
+        <Skeleton className="h-6 w-3/4 bg-white/20" />
+        <Skeleton className="h-4 w-full bg-white/20" />
+        <Skeleton className="h-4 w-2/3 bg-white/20" />
+        <div className="flex gap-2">
+          <Skeleton className="h-6 w-16 bg-white/20" />
+          <Skeleton className="h-6 w-20 bg-white/20" />
+        </div>
+        <div className="flex items-center justify-between pt-2">
+          <Skeleton className="h-4 w-24 bg-white/20" />
+          <Skeleton className="h-10 w-32 bg-white/20" />
+        </div>
+      </CardContent>
+    </Card>
   );
 
   // Empty state component
@@ -115,7 +143,7 @@ export default function ProjectsPage() {
               </p>
             </div>
 
-            {/* Actions Bar */}
+            {/* Search and Actions */}
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 h-4 w-4" />
@@ -126,6 +154,33 @@ export default function ProjectsPage() {
                   className="pl-10 bg-black border-white/20 text-white placeholder:text-white/60 focus:border-white focus:ring-white"
                 />
               </div>
+              
+              {/* Sort By Select */}
+              <div className="w-full sm:w-48">
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="bg-black border-white/20 text-white focus:border-white focus:ring-white">
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-black border-white/20">
+                    <SelectItem value="newest" className="text-white hover:bg-white/10 focus:bg-white/10">
+                      Newest First
+                    </SelectItem>
+                    <SelectItem value="oldest" className="text-white hover:bg-white/10 focus:bg-white/10">
+                      Oldest First
+                    </SelectItem>
+                    <SelectItem value="priority" className="text-white hover:bg-white/10 focus:bg-white/10">
+                      By Priority
+                    </SelectItem>
+                    <SelectItem value="status" className="text-white hover:bg-white/10 focus:bg-white/10">
+                      By Status
+                    </SelectItem>
+                    <SelectItem value="alphabetical" className="text-white hover:bg-white/10 focus:bg-white/10">
+                      Alphabetical
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
               <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
                 <DialogTrigger asChild>
                   <Button className="bg-white text-black hover:bg-white/90 transition-colors">
@@ -170,9 +225,9 @@ export default function ProjectsPage() {
             ) : (
               <>
                 {/* Projects Grid */}
-                {filteredProjects.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredProjects.map((project) => (
+                {filteredAndSortedProjects.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredAndSortedProjects.map((project) => (
                       <motion.div
                         key={project.id}
                         initial={{ opacity: 0, y: 20 }}
