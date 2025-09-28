@@ -42,6 +42,7 @@ model User {
   reminders     Reminder[]
   fees          AccountabilityFee[]
   videoHistory  UserVideoHistory[] // CHANGED: Added missing relationship
+  coursesAuthored Course[]       @relation("CoursesAuthored")
 
   @@index([learningTypeId]) // CHANGED: Added index on foreign key
 }
@@ -64,6 +65,7 @@ model Video {
 
   tags        VideoTag[]
   userHistory UserVideoHistory[] // CHANGED: Added missing relationship
+  lessons     Lesson[]
 }
 
 model VideoTag {
@@ -88,11 +90,15 @@ model Project {
   deadline    DateTime?
   createdAt   DateTime     @default(now())
 
+  courseId    String?
+  course      Course?      @relation(fields: [courseId], references: [id], onDelete: SetNull)
+
   user        User         @relation(fields: [userId], references: [id], onDelete: Cascade) // CHANGED: Added cascade delete
   milestones  Milestone[]
   fee         AccountabilityFee?
 
   @@index([userId]) // CHANGED: Added index on foreign key
+  @@index([courseId])
 }
 
 model Milestone {
@@ -159,4 +165,70 @@ model UserVideoHistory {
   @@index([userId]) // CHANGED: Added index on foreign key
   @@index([videoId]) // CHANGED: Added index on foreign key
   @@index([status]) // CHANGED: Added index on status field for filtering
+}
+
+model Course {
+  id            String    @id @default(cuid())
+  title         String    @db.VarChar(255)
+  description   String?   @db.Text
+  thumbnailUrl  String?   @db.VarChar(500)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  instructorId  Int
+  instructor    User      @relation("CoursesAuthored", fields: [instructorId], references: [id], onDelete: Cascade)
+
+  lessons       Lesson[]
+  tracks        TrackCourse[]
+  projects      Project[]
+
+  @@index([instructorId])
+}
+
+model Lesson {
+  id        String  @id @default(cuid())
+  order     Int     // The sequence number of the video in the course (1, 2, 3...)
+
+  courseId  String
+  course    Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  videoId   Int
+  video     Video   @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  @@unique([courseId, videoId])
+  @@unique([courseId, order])
+  @@index([courseId])
+  @@index([videoId])
+}
+
+model Track {
+  id            String    @id @default(cuid())
+  title         String    @db.VarChar(255)
+  description   String?   @db.Text
+  thumbnailUrl  String?   @db.VarChar(500)
+  category      String    @db.VarChar(100)
+  level         String    @db.VarChar(50)
+  totalDuration Int       @default(0) // in minutes
+  enrollmentCount Int     @default(0)
+  isPublished   Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  courses       TrackCourse[]
+
+  @@index([category])
+  @@index([level])
+  @@index([isPublished])
+}
+
+model TrackCourse {
+  order     Int
+  trackId   String
+  track     Track    @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@id([trackId, courseId])
+  @@index([trackId])
+  @@index([courseId])
 }

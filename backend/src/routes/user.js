@@ -28,4 +28,45 @@ router.get("/:id", requireAuth, async (req, res) => {
   });
 });
 
+// PATCH /user/learning-style -> update user's learning style (requires auth)
+router.patch("/learning-style", requireAuth, async (req, res) => {
+  try {
+    const userId = req.user.sub;
+    const { learningTypeId } = req.body;
+
+    // Validate learning type ID
+    if (!learningTypeId || typeof learningTypeId !== 'number') {
+      return res.status(400).json({ error: "Valid learningTypeId is required" });
+    }
+
+    // Check if learning type exists
+    const learningType = await prisma.learningType.findUnique({
+      where: { id: learningTypeId }
+    });
+
+    if (!learningType) {
+      return res.status(400).json({ error: "Invalid learning type" });
+    }
+
+    // Update user's learning type
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { learningTypeId },
+      include: { learningType: true }
+    });
+
+    res.json({
+      id: updatedUser.id,
+      learningType: {
+        id: updatedUser.learningType.id,
+        typeName: updatedUser.learningType.typeName
+      }
+    });
+
+  } catch (error) {
+    console.error("Error updating learning style:", error);
+    res.status(500).json({ error: "Failed to update learning style" });
+  }
+});
+
 export default router;

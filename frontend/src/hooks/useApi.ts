@@ -34,6 +34,16 @@ interface Project {
   teamMembers: number;
   createdAt: string;
   updatedAt: string;
+  course?: {
+    id: string;
+    title: string;
+    description: string;
+    thumbnailUrl?: string;
+    instructor: {
+      id: string;
+      name: string;
+    };
+  };
 }
 
 interface User {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -195,6 +195,31 @@ function TrackCard({ track, progress, showProgress = false }: TrackCardProps) {
             {track.category}
           </Chip>
           
+          {/* Course Preview Section */}
+          {track.courses && track.courses.length > 0 && (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm text-white/80">
+                <BookOpen className="h-4 w-4" />
+                <span>Courses in this track:</span>
+              </div>
+              <div className="space-y-1">
+                {track.courses.slice(0, 3).map((course, index) => (
+                  <div key={course.id} className="flex items-center gap-2 text-xs text-white/70">
+                    <span className="flex-shrink-0 w-5 h-5 bg-white/20 rounded-full flex items-center justify-center text-white font-medium">
+                      {index + 1}
+                    </span>
+                    <span className="truncate">{course.title}</span>
+                  </div>
+                ))}
+                {track.courses.length > 3 && (
+                  <div className="text-xs text-white/50 pl-7">
+                    +{track.courses.length - 3} more courses
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          
           {/* Progress bar (if applicable) */}
           {showProgress && progress !== undefined && (
             <div className="space-y-2">
@@ -263,9 +288,35 @@ export default function TracksPage() {
   const [sortBy, setSortBy] = useState("most-popular");
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [tracks, setTracks] = useState<Track[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch tracks from API
+  useEffect(() => {
+    const fetchTracks = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://localhost:3000/tracks');
+        if (!response.ok) {
+          throw new Error('Failed to fetch tracks');
+        }
+        const data = await response.json();
+        setTracks(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+        // Fallback to mock data if API fails
+        setTracks(mockTracks);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTracks();
+  }, []);
 
   // Filter tracks based on search and filters
-  const filteredTracks = mockTracks.filter(track => {
+  const filteredTracks = tracks.filter(track => {
     const matchesSearch = !searchTerm || 
       track.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       track.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -604,7 +655,7 @@ export default function TracksPage() {
             )}
 
             {/* Tracks Grid */}
-            {isLoading ? (
+            {loading ? (
               <div className="space-y-6">
                 {/* Featured Track Skeleton */}
                 <div className="mb-12">
@@ -657,7 +708,171 @@ export default function TracksPage() {
                   </div>
                 </div>
               </div>
-            ) : filteredTracks.length > 1 ? (
+            ) : (
+              <>
+                {/* Featured Track */}
+                {filteredTracks.length > 0 && (
+                  <div className="mb-12">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                      <div className="space-y-6">
+                        <div className="flex items-center gap-2">
+                          <Chip variant="bordered" size="sm" className="border-white/20 text-white bg-black">
+                            Featured
+                          </Chip>
+                          <LevelBadge level={filteredTracks[0].level} />
+                        </div>
+                        
+                        <h1 className="font-manrope text-4xl font-bold text-white">
+                          {filteredTracks[0].title}
+                        </h1>
+                        
+                        <p className="text-lg text-white/80 leading-relaxed">
+                          {filteredTracks[0].description}
+                        </p>
+                        
+                        <div className="flex items-center gap-6 text-sm text-white/80">
+                          <div className="flex items-center gap-2">
+                            <Clock className="h-4 w-4 text-white" />
+                            <span>{formatDuration(filteredTracks[0].totalDuration)}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <BookOpen className="h-4 w-4 text-white" />
+                            <span>{filteredTracks[0].courses?.length || 0} courses</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Users className="h-4 w-4 text-white" />
+                            <span>{filteredTracks[0].enrollmentCount.toLocaleString()}</span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex flex-col sm:flex-row gap-3">
+                          <CustomButton
+                            as={Link}
+                            href={`/tracks/${filteredTracks[0].id}`}
+                            size="lg"
+                            className="bg-white text-black hover:bg-white/90 transition-all duration-200"
+                            rightIcon={ArrowRight}
+                          >
+                            Start Learning
+                          </CustomButton>
+                          <CustomButton
+                            variant="bordered"
+                            size="lg"
+                            className="border-white/20 text-white bg-black hover:bg-white hover:text-black transition-all duration-200"
+                            onPress={() => console.log('Preview track')}
+                          >
+                            Preview
+                          </CustomButton>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-6 lg:mt-0">
+                        <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl bg-black border border-white/10">
+                          <Image
+                            src={filteredTracks[0].thumbnail}
+                            alt={filteredTracks[0].title}
+                            fill
+                            className="object-cover"
+                          />
+                          
+                          {/* Play overlay */}
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                            <div className="rounded-full bg-white/90 p-6 transition-transform hover:scale-110">
+                              <Play className="h-12 w-12 text-black" fill="currentColor" />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* All Tracks Section */}
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <h2 className="font-manrope text-2xl font-bold text-white">
+                      All Learning Tracks ({filteredTracks.length})
+                    </h2>
+                  </div>
+
+                  {filteredTracks.length === 0 ? (
+                    <div className="text-center py-12">
+                      <div className="text-white/60 text-lg">No tracks found matching your criteria.</div>
+                      <div className="text-white/40 text-sm mt-2">Try adjusting your search or filters.</div>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                      <AnimatePresence>
+                        {filteredTracks.map((track, index) => (
+                          <motion.div
+                            key={track.id}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            transition={{ duration: 0.3, delay: index * 0.1 }}
+                          >
+                            <TrackCard track={track} />
+                          </motion.div>
+                        ))}
+                      </AnimatePresence>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+              <div className="space-y-6">
+                {/* Featured Track Skeleton */}
+                <div className="mb-12">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-2">
+                        <Skeleton className="h-6 w-20 bg-white/20" />
+                        <Skeleton className="h-6 w-24 bg-white/20" />
+                      </div>
+                      <Skeleton className="h-8 w-3/4 bg-white/20" />
+                      <Skeleton className="h-4 w-full bg-white/20" />
+                      <Skeleton className="h-4 w-2/3 bg-white/20" />
+                      <div className="flex items-center gap-4">
+                        <Skeleton className="h-4 w-20 bg-white/20" />
+                        <Skeleton className="h-4 w-16 bg-white/20" />
+                        <Skeleton className="h-4 w-24 bg-white/20" />
+                      </div>
+                      <Skeleton className="h-12 w-32 bg-white/20" />
+                    </div>
+                    <div className="mt-6 lg:mt-0">
+                      <Skeleton className="aspect-[16/9] w-full bg-white/20" />
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Tracks Grid Skeleton */}
+                <div className="space-y-6">
+                  <Skeleton className="h-8 w-48 bg-white/20" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {[...Array(6)].map((_, index) => (
+                      <Card key={index} className="bg-black border-white/10">
+                        <CardBody className="p-0">
+                          <Skeleton className="aspect-video w-full bg-white/20" />
+                          <div className="p-6 space-y-4">
+                            <div className="flex items-center gap-2">
+                              <Skeleton className="h-5 w-16 bg-white/20" />
+                              <Skeleton className="h-5 w-20 bg-white/20" />
+                            </div>
+                            <Skeleton className="h-6 w-3/4 bg-white/20" />
+                            <Skeleton className="h-4 w-full bg-white/20" />
+                            <Skeleton className="h-4 w-2/3 bg-white/20" />
+                            <div className="flex items-center justify-between">
+                              <Skeleton className="h-4 w-20 bg-white/20" />
+                              <Skeleton className="h-4 w-16 bg-white/20" />
+                            </div>
+                          </div>
+                        </CardBody>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : filteredTracks.length &gt; 1 ? (
               <div
                 className="space-y-6"
               >
@@ -692,9 +907,9 @@ export default function TracksPage() {
                   Try adjusting your search or filters.
                 </p>
               </div>
-            )}
+            {'}'}
         </div>
       </div>
     </MainLayout>
-    );
+  );
 }

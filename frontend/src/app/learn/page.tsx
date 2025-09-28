@@ -33,13 +33,14 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { MainLayout } from "@/components/layouts/MainLayout";
-import { CourseCard } from "@/components/molecules/CourseCard";
+import { CourseCard } from "@/components/cards/CourseCard";
+import { CourseDetailModal } from "@/components/modals/CourseDetailModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { Course } from "@/types";
 import { debounce } from "lodash";
 
 import { VideoSearchResult, VideoSearchResponse } from "@/types";
-import { videoApi, handleApiError, retryApiCall } from "@/lib/api";
+import { courseApi, handleApiError, retryApiCall } from "@/lib/api";
 
 // Transform video data to course format
 const transformVideoToCourse = (video: VideoSearchResult): Course => ({
@@ -254,22 +255,35 @@ export default function LearnPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
+  const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
 
-  // Fetch videos from backend API
-  const fetchVideos = async (query: string) => {
-    if (!query.trim() || !accessToken) return;
+  // Fetch courses from backend API
+  const fetchCourses = async () => {
+    if (!accessToken) {
+      // Fallback to mock data if no access token
+      setCourses(mockCourses);
+      setHasSearched(true);
+      return;
+    }
 
     setLoading(true);
     setError(null);
 
     try {
-      // Use the centralized API with retry logic
-      const response = await retryApiCall(() => videoApi.searchVideos(searchQuery, accessToken));
-      const transformedCourses = (response as any).items.map(transformVideoToCourse);
-      setCourses(transformedCourses);
+      // Use the centralized API with retry logic to fetch courses
+      const response = await retryApiCall(() => courseApi.getCourses(accessToken));
+      
+      // Sort courses by compatibility score in descending order
+      const sortedCourses = (response as Course[]).sort((a, b) => {
+        const scoreA = (a as any).compatibilityScore || 0;
+        const scoreB = (b as any).compatibilityScore || 0;
+        return scoreB - scoreA;
+      });
+      
+      setCourses(sortedCourses);
       setHasSearched(true);
     } catch (err) {
-      console.error('Error fetching videos:', err);
+      console.error('Error fetching courses:', err);
       const errorMessage = handleApiError(err);
       setError(errorMessage);
       // Fallback to mock data on error
@@ -280,37 +294,32 @@ export default function LearnPage() {
     }
   };
 
-  // Debounced search function
+  // Debounced search function for filtering courses
   const debouncedSearch = useMemo(
     () => debounce((query: string) => {
       setSearchQuery(query);
-      if (query.trim()) {
-        fetchVideos(query);
-      } else {
-        setCourses([]);
-        setHasSearched(false);
-      }
     }, 500),
-    [accessToken]
+    []
   );
 
-  // Initialize with mock data if no access token
+  // Initialize courses on component mount
   useEffect(() => {
-    if (!accessToken) {
-      setCourses(mockCourses);
-      setHasSearched(true);
-    }
+    fetchCourses();
   }, [accessToken]);
 
   // Filter courses based on search and filters
   const filteredCourses = useMemo(() => {
     return courses.filter((course) => {
+      const matchesSearch = !searchQuery.trim() || 
+        course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        course.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        course.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
       const matchesCategory = selectedCategory === "All Categories" || course.category === selectedCategory;
       const matchesLevel = selectedLevel === "All Levels" || course.level === selectedLevel;
       
-      return matchesCategory && matchesLevel;
+      return matchesSearch && matchesCategory && matchesLevel;
     });
-  }, [courses, selectedCategory, selectedLevel]);
+  }, [courses, searchQuery, selectedCategory, selectedLevel]);
 
   return (
     <MainLayout>
@@ -327,10 +336,7 @@ export default function LearnPage() {
               Course Catalog
             </h1>
             <p className="text-white/80">
-              {accessToken 
-                ? "Search for videos and courses tailored to your learning style" 
-                : "Browse our course collection (sign in for personalized video search)"
-              }
+              Discover courses tailored to your learning style with personalized compatibility scores
             </p>
           </motion.div>
 
@@ -520,7 +526,10 @@ export default function LearnPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
                   >
-                    <CourseCard course={course} />
+                    <CourseCard 
+                      course={course} 
+                      onCourseClick={(courseId) => setSelectedCourseId(courseId)}
+                    />
                   </motion.div>
                 ))}
               </div>
@@ -569,6 +578,13 @@ export default function LearnPage() {
           </motion.div>
         </div>
       </div>
+
+      {/* Course Detail Modal */}
+      <CourseDetailModal
+        courseId={selectedCourseId}
+        isOpen={selectedCourseId !== null}
+        onClose={() => setSelectedCourseId(null)}
+      />
     </MainLayout>
   );
 }

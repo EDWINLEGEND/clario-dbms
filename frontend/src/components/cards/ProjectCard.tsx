@@ -9,7 +9,8 @@ import {
   Tag, 
   CheckCircle, 
   Calendar,
-  FolderOpen
+  FolderOpen,
+  BookOpen
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +36,16 @@ interface ApiProject {
   deliverables?: string[];
   category?: string;
   isPublished?: boolean;
+  course?: {
+    id: string;
+    title: string;
+    description: string;
+    thumbnailUrl?: string;
+    instructor: {
+      id: string;
+      name: string;
+    };
+  };
 }
 
 interface ProjectCardProps {
@@ -146,6 +157,19 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
 
         {/* Project Details */}
         <div className="space-y-3 mb-4">
+          {/* Course Badge - Show when project is linked to a course */}
+          {project.course && (
+            <div className="flex items-center gap-2 text-sm">
+              <BookOpen className="h-4 w-4 text-blue-400" />
+              <Badge 
+                variant="outline" 
+                className="text-xs px-2 py-1 border-blue-400/50 text-blue-400 bg-blue-400/10 hover:bg-blue-400/20 transition-colors"
+              >
+                Course: {project.course.title}
+              </Badge>
+            </div>
+          )}
+          
           {project.category && (
             <div className="flex items-center gap-2 text-sm text-white/70">
               <Tag className="h-4 w-4" />

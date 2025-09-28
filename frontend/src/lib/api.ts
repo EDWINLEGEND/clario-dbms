@@ -213,6 +213,10 @@ export const projectApi = {
 
 // Course API functions
 export const courseApi = {
+  getCourses: async (accessToken?: string) => {
+    return apiClient.get('/courses', accessToken);
+  },
+
   getCourseDetail: async (courseId: string, accessToken?: string) => {
     if (!courseId?.trim()) {
       throw new ApiError('Course ID is required', 400, 'VALIDATION_ERROR');

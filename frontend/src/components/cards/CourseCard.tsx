@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
-import { Clock, Users, Star } from "lucide-react";
+import { Clock, Users, Star, Sparkles } from "lucide-react";
 import { Course } from "@/types";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +14,7 @@ interface CourseCardProps {
   showProgress?: boolean;
   variant?: "default" | "compact" | "featured";
   className?: string;
+  onCourseClick?: (courseId: string) => void;
 }
 
 export function CourseCard({
@@ -23,22 +23,29 @@ export function CourseCard({
   showProgress = false,
   variant = "default",
   className,
+  onCourseClick,
 }: CourseCardProps) {
   const getLevelColor = (level: string) => {
     // All levels use white border and white text for black-and-white theme
     return "border-white/20 text-white bg-black";
   };
 
+  const handleCardClick = () => {
+    if (onCourseClick) {
+      onCourseClick(course.id);
+    }
+  };
+
   return (
-    <Link href={`/learn/${course.id}`} className="block">
-      <Card
-        className={cn(
-          "group cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-1",
-          "border-white/10 bg-black",
-          variant === "featured" && "border-2 border-white",
-          className
-        )}
-      >
+    <Card
+      className={cn(
+        "group cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-1",
+        "border-white/10 bg-black",
+        variant === "featured" && "border-2 border-white",
+        className
+      )}
+      onClick={handleCardClick}
+    >
         {/* Course thumbnail */}
         <div className="relative aspect-video w-full overflow-hidden rounded-t-lg">
           <Image
@@ -49,7 +56,7 @@ export function CourseCard({
           />
           
           {/* Duration badge */}
-          <div className="absolute bottom-2 right-2">
+          <div className="absolute bottom-2 left-2">
             <Badge variant="secondary" className="bg-white text-black border-0">
               <Clock className="w-3 h-3 mr-1" />
               {formatDuration(course.duration)}
@@ -62,6 +69,16 @@ export function CourseCard({
               {course.level.charAt(0).toUpperCase() + course.level.slice(1)}
             </Badge>
           </div>
+
+          {/* Compatibility Score badge */}
+          {(course as any).compatibilityScore !== undefined && (
+            <div className="absolute top-2 right-2">
+              <Badge variant="default" className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 shadow-lg">
+                <Sparkles className="w-3 h-3 mr-1" />
+                {Math.round((course as any).compatibilityScore)}% Match
+              </Badge>
+            </div>
+          )}
         </div>
 
         <CardHeader className="pb-2">
@@ -133,6 +150,5 @@ export function CourseCard({
           </Button>
         </CardFooter>
       </Card>
-    </Link>
   );
 }
