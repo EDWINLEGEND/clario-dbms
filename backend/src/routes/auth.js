@@ -14,6 +14,12 @@ function setRefreshCookie(res, token) {
 
 function isRedirectAllowed(uri) {
   const list = config.oauth.allowedRedirects;
+  
+  // Special case for 'postmessage' used in popup-based auth-code flow
+  if (uri === 'postmessage') {
+    return list.includes('postmessage');
+  }
+  
   return list.some((allowed) => {
     try {
       const a = new URL(allowed);
