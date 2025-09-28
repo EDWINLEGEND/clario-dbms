@@ -145,112 +145,114 @@ function TrackCard({ track, progress, showProgress = false }: TrackCardProps) {
     router.push(`/tracks/${track.id}`);
   };
 
+  const handleStartTrack = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click when button is clicked
+    router.push(`/tracks/${track.id}`);
+  };
+
   return (
-    <Card
-      isPressable
-      onPress={handleCardClick}
-      className="group cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-1 border-white/10 bg-black"
-    >
-      <CardHeader className="p-0 relative">
-        <div className="relative aspect-video w-full overflow-hidden rounded-t-lg">
-          <Image
-            src={track.thumbnail}
-            alt={track.title}
-            fill
-            className="object-cover transition-transform duration-200 group-hover:scale-105"
-          />
-          
-          {/* Duration badge */}
-          <div className="absolute bottom-2 right-2">
-            <Chip size="sm" className="bg-white text-black border-0">
-              <Clock className="w-3 h-3 mr-1" />
-              {formatDuration(track.totalDuration)}
-            </Chip>
-          </div>
-          
-          {/* Level badge */}
-          <div className="absolute top-3 left-3">
-            <Chip variant="bordered" size="sm" className="border-white/20 text-white bg-black">
-              {track.level.charAt(0).toUpperCase() + track.level.slice(1)}
-            </Chip>
-          </div>
-        </div>
-      </CardHeader>
-
-      <CardBody className="space-y-4 bg-black">
-        {/* Track title */}
-        <h3 className="font-manrope text-xl font-bold line-clamp-2 text-white group-hover:text-white/80 transition-colors">
-          {track.title}
-        </h3>
-        
-        {/* Track description */}
-        <p className="text-sm text-white/80 line-clamp-3">
-          {track.description}
-        </p>
-        
-        {/* Category badge */}
-        <Chip variant="bordered" size="sm" className="border-white/20 text-white bg-black">
-          {track.category}
-        </Chip>
-        
-        {/* Progress bar (if applicable) */}
-        {showProgress && progress !== undefined && (
-          <div className="space-y-2">
-            <div className="flex justify-between text-xs text-white/80">
-              <span>Progress</span>
-              <span>{progress}%</span>
-            </div>
-            <Progress 
-              value={progress} 
-              className="h-1"
-              classNames={{
-                track: "bg-white/20",
-                indicator: "bg-white"
-              }}
+    <Link href={`/tracks/${track.id}`}>
+      <Card className="group cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-1 border-white/10 bg-black">
+        <CardHeader className="p-0 relative">
+          <div className="relative aspect-video w-full overflow-hidden rounded-t-lg">
+            <Image
+              src={track.thumbnail}
+              alt={track.title}
+              fill
+              className="object-cover transition-transform duration-200 group-hover:scale-105"
             />
+            
+            {/* Duration badge */}
+            <div className="absolute bottom-2 right-2">
+              <Chip size="sm" className="bg-white text-black border-0">
+                <Clock className="w-3 h-3 mr-1" />
+                {formatDuration(track.totalDuration)}
+              </Chip>
+            </div>
+            
+            {/* Level badge */}
+            <div className="absolute top-3 left-3">
+              <Chip variant="bordered" size="sm" className="border-white/20 text-white bg-black">
+                {track.level.charAt(0).toUpperCase() + track.level.slice(1)}
+              </Chip>
+            </div>
           </div>
-        )}
-        
-        {/* Instructors */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <AvatarGroup users={mockInstructors} size="sm" max={3} />
-            <span className="text-xs text-white/80">
-              {mockInstructors.length} instructors
-            </span>
-          </div>
-          
-          <div className="flex items-center gap-1 text-xs text-white/80">
-            <Users className="h-3 w-3 text-white" />
-            <span>{track.enrollmentCount.toLocaleString()}</span>
-          </div>
-        </div>
-      </CardBody>
+        </CardHeader>
 
-      <CardFooter className="bg-black border-t border-white/10">
-        <div className="flex w-full items-center justify-between">
-          <div className="flex items-center gap-4 text-sm text-white/80">
-            <div className="flex items-center gap-1">
-              <BookOpen className="h-4 w-4 text-white" />
-              <span>{track.courses?.length || 0} courses</span>
+        <CardBody className="space-y-4 bg-black">
+          {/* Track title */}
+          <h3 className="font-manrope text-xl font-bold line-clamp-2 text-white group-hover:text-white/80 transition-colors">
+            {track.title}
+          </h3>
+          
+          {/* Track description */}
+          <p className="text-sm text-white/80 line-clamp-3">
+            {track.description}
+          </p>
+          
+          {/* Category badge */}
+          <Chip variant="bordered" size="sm" className="border-white/20 text-white bg-black">
+            {track.category}
+          </Chip>
+          
+          {/* Progress bar (if applicable) */}
+          {showProgress && progress !== undefined && (
+            <div className="space-y-2">
+              <div className="flex justify-between text-xs text-white/80">
+                <span>Progress</span>
+                <span>{progress}%</span>
+              </div>
+              <Progress 
+                value={progress} 
+                className="h-1"
+                classNames={{
+                  track: "bg-white/20",
+                  indicator: "bg-white"
+                }}
+              />
             </div>
-            <div className="flex items-center gap-1">
-              <Clock className="h-4 w-4 text-white" />
-              <span>{formatDuration(track.totalDuration)}</span>
+          )}
+          
+          {/* Instructors */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <AvatarGroup users={mockInstructors} size="sm" max={3} />
+              <span className="text-xs text-white/80">
+                {mockInstructors.length} instructors
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-1 text-xs text-white/80">
+              <Users className="h-3 w-3 text-white" />
+              <span>{track.enrollmentCount.toLocaleString()}</span>
             </div>
           </div>
-          
-          <CustomButton
-            size="sm"
-            variant="bordered"
-            className="border-white/20 text-white bg-black hover:bg-white hover:text-black transition-all duration-200"
-            rightIcon={ArrowRight}
-          >
-            Start Track
-          </CustomButton>
-        </div>
-      </CardFooter>
-    </Card>
+        </CardBody>
+
+        <CardFooter className="bg-black border-t border-white/10">
+          <div className="flex w-full items-center justify-between">
+            <div className="flex items-center gap-4 text-sm text-white/80">
+              <div className="flex items-center gap-1">
+                <BookOpen className="h-4 w-4 text-white" />
+                <span>{track.courses?.length || 0} courses</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Clock className="h-4 w-4 text-white" />
+                <span>{formatDuration(track.totalDuration)}</span>
+              </div>
+            </div>
+            
+            <div 
+              onClick={handleStartTrack}
+              className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium border border-white/20 text-white bg-black hover:bg-white hover:text-black transition-all duration-200 rounded-md cursor-pointer"
+            >
+              Start Track
+              <ArrowRight className="h-4 w-4" />
+            </div>
+          </div>
+        </CardFooter>
+      </Card>
+    </Link>
   );
 }
 

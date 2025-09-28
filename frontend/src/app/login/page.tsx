@@ -30,6 +30,9 @@ export default function LoginPage() {
           },
           body: JSON.stringify({
             code: codeResponse.code,
+            
+            // To:
+            redirectUri: 'http://localhost:3000/login',
           }),
         });
 

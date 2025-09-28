@@ -58,34 +58,8 @@ export function useVideos(query?: string, options?: Partial<UseQueryOptions<Vide
           return response as Video[];
         }
       } catch (error) {
-        // Return mock data as fallback
-        const mockVideos: Video[] = [
-          {
-            id: '1',
-            title: 'Introduction to React',
-            description: 'Learn the basics of React development',
-            thumbnail: '/api/placeholder/400/225',
-            duration: '30:00',
-            category: 'Frontend',
-            level: 'Beginner',
-            rating: '4.8',
-            instructor: 'John Doe',
-            students: '1,234',
-          },
-          {
-            id: '2',
-            title: 'Advanced JavaScript Concepts',
-            description: 'Deep dive into JavaScript advanced topics',
-            thumbnail: '/api/placeholder/400/225',
-            duration: '40:00',
-            category: 'JavaScript',
-            level: 'Advanced',
-            rating: '4.9',
-            instructor: 'Jane Smith',
-            students: '856',
-          }
-        ];
-        return mockVideos;
+        console.error("Failed to fetch videos:", error);
+        throw error; // Re-throw the error so React Query can handle it
       }
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -153,36 +127,8 @@ export function useProjects(options?: Partial<UseQueryOptions<Project[], Error>>
         const response = await apiClient.get('/projects', token || undefined);
         return response as Project[];
       } catch (error) {
-        // Return mock data as fallback
-        const mockProjects: Project[] = [
-          {
-            id: '1',
-            title: 'E-commerce Platform',
-            description: 'Build a full-stack e-commerce application',
-            status: 'active',
-            priority: 'high',
-            dueDate: '2024-03-15',
-            progress: 65,
-            tags: ['React', 'Node.js', 'MongoDB'],
-            teamMembers: 4,
-            createdAt: '2024-01-15T10:00:00Z',
-            updatedAt: '2024-01-20T14:30:00Z',
-          },
-          {
-            id: '2',
-            title: 'Mobile App Development',
-            description: 'Create a cross-platform mobile application',
-            status: 'active',
-            priority: 'medium',
-            dueDate: '2024-04-20',
-            progress: 30,
-            tags: ['React Native', 'Firebase'],
-            teamMembers: 2,
-            createdAt: '2024-01-10T09:00:00Z',
-            updatedAt: '2024-01-18T16:45:00Z',
-          }
-        ];
-        return mockProjects;
+        console.error("Failed to fetch projects:", error);
+        throw error; // Re-throw the error so React Query can handle it
       }
     },
     staleTime: 2 * 60 * 1000, // 2 minutes - projects change more frequently
@@ -432,15 +378,8 @@ export function usePrefetchVideo(id: string) {
           const token = localStorage.getItem('auth_token');
           return await apiClient.get(`/videos/${id}`, token || undefined);
         } catch (error) {
-          // Return mock data as fallback
-          return {
-            id,
-            title: 'Sample Video',
-            description: 'This is a sample video description',
-            url: 'https://example.com/video.mp4',
-            duration: 300,
-            thumbnail: 'https://example.com/thumbnail.jpg',
-          };
+          console.error(`Failed to prefetch video ${id}:`, error);
+          throw error; // Re-throw the error so React Query can handle it
         }
       },
       staleTime: 15 * 60 * 1000,
