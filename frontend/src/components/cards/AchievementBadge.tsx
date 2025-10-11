@@ -28,28 +28,28 @@ interface AchievementBadgeProps {
 
 const rarityConfig = {
   common: {
-    border: "border-gray-300",
-    bg: "bg-gray-50",
-    text: "text-gray-700",
-    accent: "bg-gray-200"
+    border: "border-white/20",
+    bg: "bg-black",
+    text: "text-white",
+    accent: "bg-white/20"
   },
   rare: {
-    border: "border-blue-300",
-    bg: "bg-blue-50",
-    text: "text-blue-700",
-    accent: "bg-blue-200"
+    border: "border-blue-500/30",
+    bg: "bg-black",
+    text: "text-blue-400",
+    accent: "bg-blue-500/20"
   },
   epic: {
-    border: "border-purple-300",
-    bg: "bg-purple-50",
-    text: "text-purple-700",
-    accent: "bg-purple-200"
+    border: "border-purple-500/30",
+    bg: "bg-black",
+    text: "text-purple-400",
+    accent: "bg-purple-500/20"
   },
   legendary: {
-    border: "border-yellow-300",
-    bg: "bg-yellow-50",
-    text: "text-yellow-700",
-    accent: "bg-yellow-200"
+    border: "border-yellow-500/30",
+    bg: "bg-black",
+    text: "text-yellow-400",
+    accent: "bg-yellow-500/20"
   }
 };
 
@@ -100,17 +100,16 @@ export function AchievementBadge({
       whileHover={achievement.isUnlocked ? { 
         scale: 1.05,
         rotateY: 5,
-        boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
       } : {}}
       whileTap={achievement.isUnlocked ? { scale: 0.95 } : {}}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
       className={className}
     >
       <Card className={cn(
-        "relative overflow-hidden border-2 transition-all duration-300",
+        "relative overflow-hidden border transition-all duration-300",
         achievement.isUnlocked 
-          ? cn(config.border, "hover:border-black bg-white") 
-          : "border-gray-200 bg-gray-50 opacity-60",
+          ? cn(config.border, config.bg, "interactive-glow hover:-translate-y-1") 
+          : "border-white/10 bg-black/50 opacity-60",
         achievement.isUnlocked && rarity === "legendary" && "animate-pulse"
       )}>
         {/* Rarity accent */}
@@ -123,8 +122,8 @@ export function AchievementBadge({
         
         {/* Lock overlay for locked achievements */}
         {!achievement.isUnlocked && (
-          <div className="absolute inset-0 bg-gray-100/80 flex items-center justify-center z-10">
-            <Lock className="h-8 w-8 text-gray-400" />
+          <div className="absolute inset-0 bg-black/80 flex items-center justify-center z-10">
+            <Lock className="h-8 w-8 text-white/40" />
           </div>
         )}
         
@@ -134,8 +133,8 @@ export function AchievementBadge({
             <div className={cn(
               "w-16 h-16 rounded-full flex items-center justify-center",
               achievement.isUnlocked 
-                ? "bg-black text-white" 
-                : "bg-gray-200 text-gray-400"
+                ? "bg-white/10 text-white backdrop-blur-sm" 
+                : "bg-white/5 text-white/40"
             )}>
               <span className={sizeStyles.icon}>
                 {achievement.icon || getDefaultIcon()}
@@ -147,13 +146,13 @@ export function AchievementBadge({
           <div className="space-y-1">
             <h3 className={cn(
               sizeStyles.title,
-              achievement.isUnlocked ? "text-black" : "text-gray-500"
+              achievement.isUnlocked ? config.text : "text-white/50"
             )}>
               {achievement.name}
             </h3>
             <p className={cn(
               sizeStyles.description,
-              "text-gray-600 leading-tight"
+              "text-white/60 leading-tight"
             )}>
               {achievement.description}
             </p>
@@ -162,15 +161,15 @@ export function AchievementBadge({
           {/* Progress Bar (for locked achievements) */}
           {!achievement.isUnlocked && achievement.progress && (
             <div className="space-y-1">
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-white/20 rounded-full h-2">
                 <div 
-                  className="bg-black h-2 rounded-full transition-all duration-300"
+                  className="bg-white h-2 rounded-full transition-all duration-300"
                   style={{ 
                     width: `${(achievement.progress.current / achievement.progress.total) * 100}%` 
                   }}
                 />
               </div>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-white/50">
                 {achievement.progress.current}/{achievement.progress.total}
               </p>
             </div>
@@ -178,7 +177,7 @@ export function AchievementBadge({
           
           {/* Unlock Date */}
           {achievement.isUnlocked && achievement.unlockedAt && (
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-white/50">
               Unlocked {achievement.unlockedAt.toLocaleDateString()}
             </p>
           )}
@@ -189,7 +188,7 @@ export function AchievementBadge({
               variant="outline" 
               className={cn(
                 sizeStyles.badge,
-                "capitalize font-bold border-black text-black"
+                "capitalize font-bold border-white/20 text-white bg-white/5"
               )}
             >
               {rarity}

@@ -32,6 +32,7 @@ import { CustomAvatar, AvatarGroup } from "@/components/atoms/CustomAvatar";
 import { MainLayout } from "@/components/layouts/MainLayout";
 import { Track } from "@/types";
 import { cn, formatDuration } from "@/lib/utils";
+import { TrackCard as TrackCardComponent } from "@/components/cards/TrackCard";
 
 // Mock data for tracks
 const mockTracks: Track[] = [
@@ -801,21 +802,35 @@ export default function TracksPage() {
                       <div className="text-white/40 text-sm mt-2">Try adjusting your search or filters.</div>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                      <AnimatePresence>
-                        {filteredTracks.map((track, index) => (
-                          <motion.div
-                            key={track.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            transition={{ duration: 0.3, delay: index * 0.1 }}
-                          >
-                            <TrackCard track={track} />
-                          </motion.div>
-                        ))}
-                      </AnimatePresence>
-                    </div>
+                    <motion.div
+                      className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
+                      variants={{
+                        hidden: { opacity: 0 },
+                        visible: {
+                          opacity: 1,
+                          transition: {
+                            staggerChildren: 0.1,
+                          },
+                        },
+                      }}
+                      initial="hidden"
+                      animate="visible"
+                    >
+                      {filteredTracks.map((track) => (
+                        <TrackCardComponent 
+                          key={track.id}
+                          id={track.id}
+                          title={track.title}
+                          description={track.description}
+                          category={track.category}
+                          difficulty={track.level}
+                          duration={formatDuration(track.totalDuration)}
+                          thumbnail={track.thumbnail}
+                          courseCount={track.courses?.length || 0}
+                          enrollmentCount={track.enrollmentCount}
+                        />
+                      ))}
+                    </motion.div>
                   )}
                 </div>
               </>

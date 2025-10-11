@@ -256,7 +256,7 @@ function DashboardContent() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-black">
       <motion.div
         className="max-w-7xl mx-auto p-6 space-y-8"
         variants={containerVariants}
@@ -265,29 +265,29 @@ function DashboardContent() {
       >
         {/* User Profile Header */}
         <motion.div variants={itemVariants}>
-          <Card className="border-2 border-gray-200 bg-gradient-to-r from-white to-gray-50">
+          <Card className="border-white/10 bg-black interactive-glow">
             <CardContent className="p-8">
               <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
                 <div className="flex items-center gap-6">
-                  <Avatar className="w-20 h-20 border-4 border-black">
+                  <Avatar className="w-20 h-20 border-4 border-white/20">
                     <AvatarImage src={mockUser.avatar} />
-                    <AvatarFallback className="bg-black text-white text-2xl font-bold">
+                    <AvatarFallback className="bg-white/10 text-white text-2xl font-bold">
                       {mockUser.name.split(' ').map(n => n[0]).join('')}
                     </AvatarFallback>
                   </Avatar>
                   
                   <div className="space-y-2">
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                    <h1 className="text-3xl font-bold text-white">
                       Welcome back, {mockUser.name.split(' ')[0]}!
                     </h1>
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-2">
                         <Flame className="h-5 w-5 text-orange-500" />
-                        <span className="text-lg font-bold text-black">
+                        <span className="text-lg font-bold text-white">
                           🔥 {mockUser.streak} Day Streak
                         </span>
                       </div>
-                      <Badge variant="outline" className="border-black text-black font-bold">
+                      <Badge variant="outline" className="border-white/20 text-white font-bold">
                         Level {mockUser.level}
                       </Badge>
                     </div>
@@ -295,25 +295,25 @@ function DashboardContent() {
                     {/* XP Progress */}
                     <div className="space-y-1">
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">XP Progress</span>
-                        <span className="font-bold text-black">
+                        <span className="text-white/60">XP Progress</span>
+                        <span className="font-bold text-white">
                           {mockUser.xp}/{mockUser.nextLevelXp}
                         </span>
                       </div>
                       <Progress 
                         value={(mockUser.xp / mockUser.nextLevelXp) * 100} 
-                        className="h-2 bg-gray-200"
+                        className="h-2 bg-white/20"
                       />
                     </div>
                   </div>
                 </div>
                 
                 <div className="flex gap-3">
-                  <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50">
+                  <Button variant="outline" className="border-white/20 text-white hover:bg-white/10">
                     <Calendar className="h-4 w-4 mr-2" />
                     Schedule
                   </Button>
-                  <Button className="bg-primary text-white hover:bg-primary/90">
+                  <Button className="bg-white text-black hover:bg-white/90">
                     <Target className="h-4 w-4 mr-2" />
                     Set Goals
                   </Button>
@@ -344,31 +344,42 @@ function DashboardContent() {
             {/* Overview Tab */}
             <TabsContent value="overview" className="space-y-8 mt-8">
               {/* Key Statistics */}
-              <motion.div variants={itemVariants}>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  <StatCard
-                    title="Courses Enrolled"
-                    value={totalCoursesEnrolled}
-                    icon={BookOpen}
-                    trend={{ value: 12, isPositive: true }}
-                  />
-                  <StatCard
-                    title="Completed Courses"
-                    value={completedCourses}
-                    icon={CheckCircle}
-                  />
-                  <StatCard
-                    title="Hours Learned"
-                    value={Math.round(totalTimeSpent / 60)}
-                    icon={Clock}
-                    trend={{ value: 8, isPositive: true }}
-                  />
-                  <StatCard
-                    title="Achievements"
-                    value={unlockedAchievements}
-                    icon={Trophy}
-                  />
-                </div>
+              <motion.div 
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+                variants={{
+                  hidden: { opacity: 0 },
+                  visible: {
+                    opacity: 1,
+                    transition: {
+                      staggerChildren: 0.1,
+                    },
+                  },
+                }}
+                initial="hidden"
+                animate="visible"
+              >
+                <StatCard
+                  title="Courses Enrolled"
+                  value={totalCoursesEnrolled}
+                  icon={BookOpen}
+                  trend={{ value: 12, isPositive: true }}
+                />
+                <StatCard
+                  title="Completed Courses"
+                  value={completedCourses}
+                  icon={CheckCircle}
+                />
+                <StatCard
+                  title="Hours Learned"
+                  value={Math.round(totalTimeSpent / 60)}
+                  icon={Clock}
+                  trend={{ value: 8, isPositive: true }}
+                />
+                <StatCard
+                  title="Achievements"
+                  value={unlockedAchievements}
+                  icon={Trophy}
+                />
               </motion.div>
 
               {/* Main Content Grid */}

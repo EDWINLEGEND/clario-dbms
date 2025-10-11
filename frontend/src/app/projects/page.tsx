@@ -226,18 +226,24 @@ export default function ProjectsPage() {
               <>
                 {/* Projects Grid */}
                 {filteredAndSortedProjects.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredAndSortedProjects.map((project) => (
-                      <motion.div
-                        key={project.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        <ProjectCard project={project} />
-                      </motion.div>
+                  <motion.div
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                    variants={{
+                      hidden: { opacity: 0 },
+                      visible: {
+                        opacity: 1,
+                        transition: {
+                          staggerChildren: 0.1,
+                        },
+                      },
+                    }}
+                    initial="hidden"
+                    animate="visible"
+                  >
+                    {filteredAndSortedProjects.map((project) => (
+                      <ProjectCard key={project.id} project={project} />
                     ))}
-                  </div>
+                  </motion.div>
                 ) : (
                   /* Empty State */
                   <div className="text-center py-12">

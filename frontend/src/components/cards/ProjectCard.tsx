@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { 
@@ -17,6 +18,20 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Project } from "@/types";
+
+// Animation variants for staggered entrance
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: { 
+    y: 0, 
+    opacity: 1,
+    transition: {
+      type: "spring",
+      stiffness: 300,
+      damping: 30,
+    }
+  },
+};
 
 // Extended interface for dynamic project data from API
 interface ApiProject {
@@ -97,12 +112,14 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
   };
 
   return (
-    <Card
-      className={cn(
-        "group relative overflow-hidden border-2 border-white/20 bg-black transition-all duration-300 hover:border-white hover:shadow-lg",
-        className
-      )}
-    >
+    <motion.div variants={itemVariants}>
+      <Card
+        className={cn(
+          "group relative overflow-hidden border-white/10 bg-black transition-all duration-300",
+          "interactive-glow hover:-translate-y-2",
+          className
+        )}
+      >
       {/* Thumbnail Section */}
       <div className="relative h-48 overflow-hidden bg-black border-b border-white/20">
         {project.thumbnail ? (
@@ -243,5 +260,6 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
         </div>
       </CardContent>
     </Card>
+    </motion.div>
   );
 }

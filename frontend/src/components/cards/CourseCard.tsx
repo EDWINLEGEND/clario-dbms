@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import Image from "next/image";
 import { Clock, Users, Star, Sparkles } from "lucide-react";
 import { Course } from "@/types";
@@ -16,6 +17,20 @@ interface CourseCardProps {
   className?: string;
   onCourseClick?: (courseId: string) => void;
 }
+
+// Animation variants for staggered entrance
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: { 
+    y: 0, 
+    opacity: 1,
+    transition: {
+      type: "spring",
+      stiffness: 300,
+      damping: 30,
+    }
+  },
+};
 
 export function CourseCard({
   course,
@@ -37,15 +52,18 @@ export function CourseCard({
   };
 
   return (
-    <Card
-      className={cn(
-        "group cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-1",
-        "border-white/10 bg-black",
-        variant === "featured" && "border-2 border-white",
-        className
-      )}
-      onClick={handleCardClick}
-    >
+    <motion.div variants={itemVariants}>
+      <Card
+        className={cn(
+          "group cursor-pointer transition-all duration-300",
+          "border-white/10 bg-black",
+          "interactive-glow",
+          "hover:-translate-y-2",
+          variant === "featured" && "border-2 border-white",
+          className
+        )}
+        onClick={handleCardClick}
+      >
         {/* Course thumbnail */}
         <div className="relative aspect-video w-full overflow-hidden rounded-t-lg">
           <Image
@@ -150,5 +168,6 @@ export function CourseCard({
           </Button>
         </CardFooter>
       </Card>
+    </motion.div>
   );
 }

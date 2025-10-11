@@ -1,6 +1,5 @@
 "use client";
 
-import { HeroUIProvider } from "@heroui/react";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { AuthProvider } from "@/contexts/AuthContext";
 
@@ -13,11 +12,9 @@ export function Providers({ children }: ProvidersProps) {
 
   return (
     <GoogleOAuthProvider clientId={googleClientId}>
-      <HeroUIProvider>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
-      </HeroUIProvider>
+      <AuthProvider>
+        {children}
+      </AuthProvider>
     </GoogleOAuthProvider>
   );
 }

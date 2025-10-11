@@ -104,6 +104,44 @@
   .btn-glaze-hover:hover::before {
     opacity: 1;
   }
+
+  /* Interactive Glow Effect */
+  .interactive-glow {
+    /* Creates a subtle white glow effect */
+    box-shadow: 0 0 0px 0px rgba(255, 255, 255, 0.2);
+    transition: box-shadow 0.3s ease-in-out;
+  }
+  
+  .interactive-glow:hover {
+    box-shadow: 0 0 15px 3px rgba(255, 255, 255, 0.1);
+  }
+
+  /* Enhanced Shadow Effect */
+  .interactive-shadow {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: box-shadow 0.3s ease-in-out;
+  }
+  
+  .interactive-shadow:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Combined Glow and Shadow */
+  .interactive-effect {
+    box-shadow: 
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06),
+      0 0 0px 0px rgba(255, 255, 255, 0.2);
+    transition: box-shadow 0.3s ease-in-out, transform 0.2s ease-in-out;
+  }
+  
+  .interactive-effect:hover {
+    box-shadow: 
+      0 10px 15px -3px rgba(0, 0, 0, 0.2),
+      0 4px 6px -2px rgba(0, 0, 0, 0.1),
+      0 0 15px 3px rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+  }
 }
 
 @keyframes fadeIn {

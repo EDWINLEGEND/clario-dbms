@@ -496,11 +496,7 @@ export default function LearnPage() {
           </motion.div>
 
           {/* Course Grid */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
+          <div>
             {loading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[...Array(6)].map((_, index) => (
@@ -518,21 +514,28 @@ export default function LearnPage() {
                 ))}
               </div>
             ) : filteredCourses.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredCourses.map((course, index) => (
-                  <motion.div
+              <motion.div
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                variants={{
+                  hidden: { opacity: 0 },
+                  visible: {
+                    opacity: 1,
+                    transition: {
+                      staggerChildren: 0.1,
+                    },
+                  },
+                }}
+                initial="hidden"
+                animate="visible"
+              >
+                {filteredCourses.map((course) => (
+                  <CourseCard 
                     key={course.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                  >
-                    <CourseCard 
-                      course={course} 
-                      onCourseClick={(courseId) => setSelectedCourseId(courseId)}
-                    />
-                  </motion.div>
+                    course={course} 
+                    onCourseClick={(courseId) => setSelectedCourseId(courseId)}
+                  />
                 ))}
-              </div>
+              </motion.div>
             ) : hasSearched ? (
               <div className="text-center py-12">
                 <div className="text-white/60 mb-4">
@@ -575,7 +578,7 @@ export default function LearnPage() {
                 </p>
               </div>
             )}
-          </motion.div>
+          </div>
         </div>
       </div>
 
