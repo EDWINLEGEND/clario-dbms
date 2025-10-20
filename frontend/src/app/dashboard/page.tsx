@@ -57,8 +57,8 @@ import { VideoHistory, VideoHistoryResponse } from "@/types";
 // Mock user data
 const mockUser = {
   id: "1",
-  name: "Alex Johnson",
-  email: "alex@example.com",
+  name: "Edwin Shaju Malakaran",
+  email: "edwinshajumalakarancoc@gmail.com",
   avatar: undefined,
   streak: 14,
   level: 5,
