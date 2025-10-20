@@ -321,24 +321,74 @@ export default function LearnPage() {
     });
   }, [courses, searchQuery, selectedCategory, selectedLevel]);
 
+  // Mock recommended courses (would be fetched based on user's learning type)
+  const recommendedCourses = courses.slice(0, 3);
+  const showRecommended = accessToken && recommendedCourses.length > 0;
+
   return (
     <MainLayout>
-      <div className="min-h-screen bg-black">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="mb-8"
-          >
-            <h1 className="text-3xl font-bold text-white mb-4">
-              Course Catalog
-            </h1>
-            <p className="text-white/80">
-              Discover courses tailored to your learning style with personalized compatibility scores
-            </p>
-          </motion.div>
+      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
+        {/* Hero Section */}
+        <div className="relative overflow-hidden bg-gradient-to-b from-black to-gray-900 border-b border-white/10">
+          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2071&q=80')] opacity-10 bg-cover bg-center" />
+          <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent" />
+          
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-center max-w-3xl mx-auto"
+            >
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 md:mb-6">
+                Discover Your Perfect Course
+              </h1>
+              <p className="text-base md:text-lg text-white/70 mb-8">
+                AI-powered recommendations tailored to your learning style. Find courses that match your goals with personalized compatibility scores.
+              </p>
+            </motion.div>
+          </div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+          {/* Recommended Section */}
+          {showRecommended && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="mb-12"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
+                    Recommended For You
+                  </h2>
+                  <p className="text-sm md:text-base text-white/70">
+                    Based on your learning style and interests
+                  </p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {recommendedCourses.map((course) => (
+                  <CourseCard
+                    key={course.id}
+                    course={course}
+                    onCourseClick={(courseId) => setSelectedCourseId(courseId)}
+                    variant="featured"
+                  />
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* All Courses Header */}
+          <div className="mb-6">
+            <h2 className="text-2xl md:text-3xl font-bold text-white">
+              {showRecommended ? 'All Courses' : 'Course Catalog'}
+            </h2>
+          </div>
 
           {/* Search and Filters */}
           <motion.div
@@ -357,7 +407,7 @@ export default function LearnPage() {
                       ? "Search for videos, topics, or skills..." 
                       : "Sign in to search personalized video content..."
                     }
-                    className="pl-10 h-12 bg-black border-white/20 text-white placeholder:text-white/60 focus:border-white focus:ring-white"
+                    className="pl-10 h-11 md:h-12 bg-white/5 backdrop-blur-sm border-white/20 text-white placeholder:text-white/60 focus:border-white/40 focus:ring-white/20 transition-all"
                     onChange={(e) => debouncedSearch(e.target.value)}
                     disabled={!accessToken}
                   />
@@ -374,7 +424,7 @@ export default function LearnPage() {
                     <CollapsibleTrigger asChild>
                       <Button
                         variant="outline"
-                        className="w-full h-12 bg-black border-white/20 text-white hover:bg-white/10"
+                        className="w-full h-11 md:h-12 bg-white/5 backdrop-blur-sm border-white/20 text-white hover:bg-white/10 hover:border-white/30 transition-all"
                       >
                         <Filter className="h-4 w-4 mr-2" />
                         Show Filters
@@ -388,10 +438,10 @@ export default function LearnPage() {
                     <CollapsibleContent className="space-y-4 mt-4">
                       {/* Mobile Filters */}
                       <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                        <SelectTrigger className="w-full h-12 bg-black border-white/20 text-white focus:border-white focus:ring-white">
+                        <SelectTrigger className="w-full h-11 md:h-12 bg-white/5 backdrop-blur-sm border-white/20 text-white focus:border-white/40 focus:ring-white/20">
                           <SelectValue placeholder="Category" />
                         </SelectTrigger>
-                        <SelectContent className="bg-black border-white/20">
+                        <SelectContent className="bg-gray-900 border-white/20 backdrop-blur-xl">
                           {categories.map((category) => (
                             <SelectItem key={category} value={category} className="text-white hover:bg-white/10 focus:bg-white/10">
                               {category}
@@ -401,10 +451,10 @@ export default function LearnPage() {
                       </Select>
 
                       <Select value={selectedLevel} onValueChange={setSelectedLevel}>
-                        <SelectTrigger className="w-full h-12 bg-black border-white/20 text-white focus:border-white focus:ring-white">
+                        <SelectTrigger className="w-full h-11 md:h-12 bg-white/5 backdrop-blur-sm border-white/20 text-white focus:border-white/40 focus:ring-white/20">
                           <SelectValue placeholder="Level" />
                         </SelectTrigger>
-                        <SelectContent className="bg-black border-white/20">
+                        <SelectContent className="bg-gray-900 border-white/20 backdrop-blur-xl">
                           {levels.map((level) => (
                             <SelectItem key={level} value={level} className="text-white hover:bg-white/10 focus:bg-white/10">
                               {level === "All Levels" ? level : level.charAt(0).toUpperCase() + level.slice(1)}
@@ -414,10 +464,10 @@ export default function LearnPage() {
                       </Select>
 
                       <Select value={sortBy} onValueChange={setSortBy}>
-                        <SelectTrigger className="w-full h-12 bg-black border-white/20 text-white focus:border-white focus:ring-white">
+                        <SelectTrigger className="w-full h-11 md:h-12 bg-white/5 backdrop-blur-sm border-white/20 text-white focus:border-white/40 focus:ring-white/20">
                           <SelectValue placeholder="Sort by" />
                         </SelectTrigger>
-                        <SelectContent className="bg-black border-white/20">
+                        <SelectContent className="bg-gray-900 border-white/20 backdrop-blur-xl">
                           <SelectItem value="most-relevant" className="text-white hover:bg-white/10 focus:bg-white/10">
                             Most Relevant
                           </SelectItem>
@@ -432,12 +482,12 @@ export default function LearnPage() {
               </div>
 
               {/* Desktop Filters - Always Visible on Large Screens */}
-              <div className="hidden sm:flex gap-4">
+              <div className="hidden sm:flex gap-3 md:gap-4">
                 <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger className="w-48 h-12 bg-black border-white/20 text-white focus:border-white focus:ring-white">
+                  <SelectTrigger className="w-40 md:w-48 h-11 md:h-12 bg-white/5 backdrop-blur-sm border-white/20 text-white focus:border-white/40 focus:ring-white/20">
                     <SelectValue placeholder="Category" />
                   </SelectTrigger>
-                  <SelectContent className="bg-black border-white/20">
+                  <SelectContent className="bg-gray-900 border-white/20 backdrop-blur-xl">
                     {categories.map((category) => (
                       <SelectItem key={category} value={category} className="text-white hover:bg-white/10 focus:bg-white/10">
                         {category}
@@ -447,10 +497,10 @@ export default function LearnPage() {
                 </Select>
 
                 <Select value={selectedLevel} onValueChange={setSelectedLevel}>
-                  <SelectTrigger className="w-48 h-12 bg-black border-white/20 text-white focus:border-white focus:ring-white">
+                  <SelectTrigger className="w-40 md:w-48 h-11 md:h-12 bg-white/5 backdrop-blur-sm border-white/20 text-white focus:border-white/40 focus:ring-white/20">
                     <SelectValue placeholder="Level" />
                   </SelectTrigger>
-                  <SelectContent className="bg-black border-white/20">
+                  <SelectContent className="bg-gray-900 border-white/20 backdrop-blur-xl">
                     {levels.map((level) => (
                       <SelectItem key={level} value={level} className="text-white hover:bg-white/10 focus:bg-white/10">
                         {level === "All Levels" ? level : level.charAt(0).toUpperCase() + level.slice(1)}
@@ -460,10 +510,10 @@ export default function LearnPage() {
                 </Select>
 
                 <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-48 h-12 bg-black border-white/20 text-white focus:border-white focus:ring-white">
+                  <SelectTrigger className="w-40 md:w-48 h-11 md:h-12 bg-white/5 backdrop-blur-sm border-white/20 text-white focus:border-white/40 focus:ring-white/20">
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
-                  <SelectContent className="bg-black border-white/20">
+                  <SelectContent className="bg-gray-900 border-white/20 backdrop-blur-xl">
                     <SelectItem value="most-relevant" className="text-white hover:bg-white/10 focus:bg-white/10">
                       Most Relevant
                     </SelectItem>
@@ -477,8 +527,8 @@ export default function LearnPage() {
 
             {/* Results Count and Error Display */}
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <p className="text-sm text-white/80">
+              <div className="flex items-center gap-4 flex-wrap">
+                <p className="text-xs md:text-sm text-white/70">
                   {hasSearched 
                     ? `Showing ${filteredCourses.length} of ${courses.length} results`
                     : accessToken 
@@ -487,7 +537,7 @@ export default function LearnPage() {
                   }
                 </p>
                 {error && (
-                  <p className="text-sm text-red-400 bg-red-900/20 px-3 py-1 rounded-md border border-red-400/20">
+                  <p className="text-xs md:text-sm text-red-400 bg-red-900/20 px-3 py-1.5 rounded-lg border border-red-400/30 backdrop-blur-sm">
                     {error}
                   </p>
                 )}
@@ -498,30 +548,30 @@ export default function LearnPage() {
           {/* Course Grid */}
           <div>
             {loading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 {[...Array(6)].map((_, index) => (
-                  <Card key={index} className="bg-black border-white/10">
+                  <Card key={index} className="bg-gradient-to-br from-white/5 to-white/[0.02] border-white/10 backdrop-blur-sm">
                     <CardHeader>
-                      <Skeleton className="h-4 w-3/4 mb-2 bg-white/20" />
-                      <Skeleton className="h-3 w-1/2 bg-white/20" />
+                      <Skeleton className="h-4 w-3/4 mb-2 bg-white/10" />
+                      <Skeleton className="h-3 w-1/2 bg-white/10" />
                     </CardHeader>
                     <CardContent>
-                      <Skeleton className="aspect-video w-full mb-4 bg-white/20" />
-                      <Skeleton className="h-3 w-full mb-2 bg-white/20" />
-                      <Skeleton className="h-3 w-2/3 bg-white/20" />
+                      <Skeleton className="aspect-video w-full mb-4 bg-white/10 rounded-lg" />
+                      <Skeleton className="h-3 w-full mb-2 bg-white/10" />
+                      <Skeleton className="h-3 w-2/3 bg-white/10" />
                     </CardContent>
                   </Card>
                 ))}
               </div>
             ) : filteredCourses.length > 0 ? (
               <motion.div
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"
                 variants={{
                   hidden: { opacity: 0 },
                   visible: {
                     opacity: 1,
                     transition: {
-                      staggerChildren: 0.1,
+                      staggerChildren: 0.08,
                     },
                   },
                 }}
@@ -550,7 +600,7 @@ export default function LearnPage() {
                 </p>
                 <Button
                   variant="outline"
-                  className="mt-4 bg-black border-white/20 text-white hover:bg-white/10"
+                  className="mt-4 bg-white/5 backdrop-blur-sm border-white/20 text-white hover:bg-white/10 hover:border-white/30 transition-all"
                   onClick={() => {
                     setSearchQuery("");
                     setSelectedCategory("All Categories");

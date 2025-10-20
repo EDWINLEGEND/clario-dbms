@@ -209,15 +209,30 @@ export const cacheWarmingStrategies = {
   // Warm up cache with essential data on app start
   warmEssentialData: async (queryClient: QueryClient) => {
     const essentialQueries = [
-      { queryKey: ['auth', 'user'], priority: 'high' },
-      { queryKey: ['projects'], priority: 'high' },
-      { queryKey: ['videos'], priority: 'medium' },
+      { 
+        queryKey: ['auth', 'user'], 
+        priority: 'high',
+        queryFn: () => Promise.resolve(null) // No user initially
+      },
+      { 
+        queryKey: ['projects'], 
+        priority: 'high',
+        queryFn: () => Promise.resolve([]) // Empty projects array
+      },
+      { 
+        queryKey: ['videos'], 
+        priority: 'medium',
+        queryFn: () => Promise.resolve([]) // Empty videos array
+      },
     ];
     
     // Prefetch high priority queries immediately
     const highPriorityQueries = essentialQueries
       .filter(q => q.priority === 'high')
-      .map(q => queryClient.prefetchQuery({ queryKey: q.queryKey, queryFn: () => {} }));
+      .map(q => queryClient.prefetchQuery({ 
+        queryKey: q.queryKey, 
+        queryFn: q.queryFn 
+      }));
     
     await Promise.all(highPriorityQueries);
     
@@ -225,7 +240,10 @@ export const cacheWarmingStrategies = {
     setTimeout(() => {
       essentialQueries
         .filter(q => q.priority === 'medium')
-        .forEach(q => queryClient.prefetchQuery({ queryKey: q.queryKey, queryFn: () => {} }));
+        .forEach(q => queryClient.prefetchQuery({ 
+          queryKey: q.queryKey, 
+          queryFn: q.queryFn 
+        }));
     }, 1000);
   },
   

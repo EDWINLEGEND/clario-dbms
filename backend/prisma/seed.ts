@@ -5,6 +5,23 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Starting database seeding...');
 
+  // Clear existing data to avoid conflicts
+  console.log('🧹 Clearing existing data...');
+  await prisma.reminder.deleteMany();
+  await prisma.accountabilityFee.deleteMany();
+  await prisma.milestone.deleteMany();
+  await prisma.project.deleteMany();
+  await prisma.userVideoHistory.deleteMany();
+  await prisma.trackCourse.deleteMany();
+  await prisma.lesson.deleteMany();
+  await prisma.course.deleteMany();
+  await prisma.track.deleteMany();
+  await prisma.videoTag.deleteMany();
+  await prisma.video.deleteMany();
+  await prisma.user.deleteMany();
+  await prisma.learningType.deleteMany();
+  console.log('✅ Cleared existing data');
+
   // Step 1: Seed Learning Types
   console.log('📚 Seeding Learning Types...');
   
@@ -153,11 +170,79 @@ async function main() {
 
   console.log(`✅ Created ${videoTags.length} video tags linking videos to learning types`);
 
-  // Step 4: Seed Sample Users (Instructors)
-  console.log('👥 Seeding Sample Users (Instructors)...');
+  // Step 4: Seed Demo User Personas (5 diverse learners for MVP demo)
+  console.log('👥 Seeding Demo User Personas...');
 
-  const instructor1 = await prisma.user.create({
-    data: {
+  // User 1: Alex Chen - Visual Learner, College Student (High Engagement)
+  const alexChen = await prisma.user.upsert({
+    where: { email: 'alex.chen@clario-demo.com' },
+    update: {},
+    create: {
+      name: 'Alex Chen',
+      email: 'alex.chen@clario-demo.com',
+      learningType: {
+        connect: { id: 1 } // Visual learner
+      }
+    }
+  });
+
+  // User 2: Maya Rodriguez - Auditory Learner, Early Professional (Medium Engagement)
+  const mayaRodriguez = await prisma.user.upsert({
+    where: { email: 'maya.rodriguez@clario-demo.com' },
+    update: {},
+    create: {
+      name: 'Maya Rodriguez',
+      email: 'maya.rodriguez@clario-demo.com',
+      learningType: {
+        connect: { id: 2 } // Auditory learner
+      }
+    }
+  });
+
+  // User 3: Jordan Park - Kinesthetic Learner, Independent Developer (Very High Engagement)
+  const jordanPark = await prisma.user.upsert({
+    where: { email: 'jordan.park@clario-demo.com' },
+    update: {},
+    create: {
+      name: 'Jordan Park',
+      email: 'jordan.park@clario-demo.com',
+      learningType: {
+        connect: { id: 3 } // Kinesthetic learner
+      }
+    }
+  });
+
+  // User 4: Sarah Thompson - Visual Learner, Career Switcher (New User)
+  const sarahThompson = await prisma.user.upsert({
+    where: { email: 'sarah.thompson@clario-demo.com' },
+    update: {},
+    create: {
+      name: 'Sarah Thompson',
+      email: 'sarah.thompson@clario-demo.com',
+      learningType: {
+        connect: { id: 1 } // Visual learner
+      }
+    }
+  });
+
+  // User 5: David Kumar - Auditory Learner, Graduate Student (Medium-High Engagement)
+  const davidKumar = await prisma.user.upsert({
+    where: { email: 'david.kumar@clario-demo.com' },
+    update: {},
+    create: {
+      name: 'David Kumar',
+      email: 'david.kumar@clario-demo.com',
+      learningType: {
+        connect: { id: 2 } // Auditory learner
+      }
+    }
+  });
+
+  // Additional Instructors for courses
+  const instructor1 = await prisma.user.upsert({
+    where: { email: 'sarah.johnson@example.com' },
+    update: {},
+    create: {
       name: 'Dr. Sarah Johnson',
       email: 'sarah.johnson@example.com',
       learningType: {
@@ -166,8 +251,10 @@ async function main() {
     }
   });
 
-  const instructor2 = await prisma.user.create({
-    data: {
+  const instructor2 = await prisma.user.upsert({
+    where: { email: 'michael.chen@example.com' },
+    update: {},
+    create: {
       name: 'Prof. Michael Chen',
       email: 'michael.chen@example.com',
       learningType: {
@@ -176,7 +263,7 @@ async function main() {
     }
   });
 
-  console.log(`✅ Created sample instructors: ${instructor1.name}, ${instructor2.name}`);
+  console.log(`✅ Created 5 demo user personas + 2 instructors`);
 
   // Step 5: Seed Sample Courses
   console.log('📚 Seeding Sample Courses...');
@@ -295,30 +382,358 @@ async function main() {
 
   console.log(`✅ Created ${trackCourseRelations.length} track-course relationships`);
 
-  // Step 9: Seed Sample Projects with Course Links
-  console.log('📋 Seeding Sample Projects...');
+  // Step 9: Seed Video History for Demo Users
+  console.log('📺 Seeding Video History for Demo Users...');
 
-  const sampleProject = await prisma.project.create({
-    data: {
-      title: 'E-commerce Website Development',
-      description: 'Build a complete e-commerce website using modern web technologies. Apply concepts from the Web Development Fundamentals course.',
-      deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
-      userId: instructor1.id,
-      courseId: webDevCourse.id // Link to Web Development Fundamentals course
-    }
+  const now = new Date();
+  const daysAgo = (days: number) => new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+
+  // Alex Chen - Visual Learner (8-10 videos, mix of completed & in-progress)
+  const alexHistory = [
+    { userId: alexChen.id, videoId: 4, percentWatched: 100, status: 'COMPLETED' as const, watchedAt: daysAgo(18), completedAt: daysAgo(18) },
+    { userId: alexChen.id, videoId: 8, percentWatched: 100, status: 'COMPLETED' as const, watchedAt: daysAgo(15), completedAt: daysAgo(15) },
+    { userId: alexChen.id, videoId: 1, percentWatched: 100, status: 'COMPLETED' as const, watchedAt: daysAgo(12), completedAt: daysAgo(12) },
+    { userId: alexChen.id, videoId: 2, percentWatched: 75, status: 'STARTED' as const, watchedAt: daysAgo(8) },
+    { userId: alexChen.id, videoId: 5, percentWatched: 60, status: 'STARTED' as const, watchedAt: daysAgo(5) },
+    { userId: alexChen.id, videoId: 7, percentWatched: 40, status: 'STARTED' as const, watchedAt: daysAgo(3) },
+    { userId: alexChen.id, videoId: 3, percentWatched: 85, status: 'STARTED' as const, watchedAt: daysAgo(2) },
+    { userId: alexChen.id, videoId: 6, percentWatched: 30, status: 'STARTED' as const, watchedAt: daysAgo(1) },
+  ];
+
+  // Maya Rodriguez - Auditory Learner (6-8 videos, prefers lectures)
+  const mayaHistory = [
+    { userId: mayaRodriguez.id, videoId: 5, percentWatched: 100, status: 'COMPLETED' as const, watchedAt: daysAgo(20), completedAt: daysAgo(20) },
+    { userId: mayaRodriguez.id, videoId: 7, percentWatched: 100, status: 'COMPLETED' as const, watchedAt: daysAgo(14), completedAt: daysAgo(14) },
+    { userId: mayaRodriguez.id, videoId: 1, percentWatched: 90, status: 'STARTED' as const, watchedAt: daysAgo(10) },
+    { userId: mayaRodriguez.id, videoId: 2, percentWatched: 100, status: 'COMPLETED' as const, watchedAt: daysAgo(7), completedAt: daysAgo(7) },
+    { userId: mayaRodriguez.id, videoId: 4, percentWatched: 65, status: 'STARTED' as const, watchedAt: daysAgo(4) },
+    { userId: mayaRodriguez.id, videoId: 8, percentWatched: 45, status: 'STARTED' as const, watchedAt: daysAgo(2) },
+  ];
+
+  // Jordan Park - Kinesthetic Learner (12+ videos, workshops & coding-along)
+  const jordanHistory = [
+    { userId: jordanPark.id, videoId: 3, percentWatched: 100, status: 'COMPLETED' as const, watchedAt: daysAgo(40), completedAt: daysAgo(40) },
+    { userId: jordanPark.id, videoId: 6, percentWatched: 100, status: 'COMPLETED' as const, watchedAt: daysAgo(35), completedAt: daysAgo(35) },
+    { userId: jordanPark.id, videoId: 1, percentWatched: 100, status: 'COMPLETED' as const, watchedAt: daysAgo(30), completedAt: daysAgo(30) },
+    { userId: jordanPark.id, videoId: 2, percentWatched: 100, status: 'COMPLETED' as const, watchedAt: daysAgo(25), completedAt: daysAgo(25) },
+    { userId: jordanPark.id, videoId: 7, percentWatched: 100, status: 'COMPLETED' as const, watchedAt: daysAgo(20), completedAt: daysAgo(20) },
+    { userId: jordanPark.id, videoId: 4, percentWatched: 100, status: 'COMPLETED' as const, watchedAt: daysAgo(15), completedAt: daysAgo(15) },
+    { userId: jordanPark.id, videoId: 5, percentWatched: 100, status: 'COMPLETED' as const, watchedAt: daysAgo(12), completedAt: daysAgo(12) },
+    { userId: jordanPark.id, videoId: 8, percentWatched: 100, status: 'COMPLETED' as const, watchedAt: daysAgo(10), completedAt: daysAgo(10) },
+    { userId: jordanPark.id, videoId: 3, percentWatched: 95, status: 'STARTED' as const, watchedAt: daysAgo(6) },
+    { userId: jordanPark.id, videoId: 6, percentWatched: 80, status: 'STARTED' as const, watchedAt: daysAgo(4) },
+    { userId: jordanPark.id, videoId: 1, percentWatched: 70, status: 'STARTED' as const, watchedAt: daysAgo(2) },
+    { userId: jordanPark.id, videoId: 2, percentWatched: 55, status: 'STARTED' as const, watchedAt: daysAgo(1) },
+  ];
+
+  // Sarah Thompson - Visual Learner, New User (4-5 videos, just getting started)
+  const sarahHistory = [
+    { userId: sarahThompson.id, videoId: 1, percentWatched: 100, status: 'COMPLETED' as const, watchedAt: daysAgo(4), completedAt: daysAgo(4) },
+    { userId: sarahThompson.id, videoId: 4, percentWatched: 80, status: 'STARTED' as const, watchedAt: daysAgo(3) },
+    { userId: sarahThompson.id, videoId: 8, percentWatched: 60, status: 'STARTED' as const, watchedAt: daysAgo(2) },
+    { userId: sarahThompson.id, videoId: 2, percentWatched: 35, status: 'STARTED' as const, watchedAt: daysAgo(1) },
+  ];
+
+  // David Kumar - Auditory Learner, Graduate Student (7-9 videos, data science focus)
+  const davidHistory = [
+    { userId: davidKumar.id, videoId: 6, percentWatched: 100, status: 'COMPLETED' as const, watchedAt: daysAgo(25), completedAt: daysAgo(25) },
+    { userId: davidKumar.id, videoId: 8, percentWatched: 100, status: 'COMPLETED' as const, watchedAt: daysAgo(20), completedAt: daysAgo(20) },
+    { userId: davidKumar.id, videoId: 5, percentWatched: 100, status: 'COMPLETED' as const, watchedAt: daysAgo(15), completedAt: daysAgo(15) },
+    { userId: davidKumar.id, videoId: 1, percentWatched: 85, status: 'STARTED' as const, watchedAt: daysAgo(10) },
+    { userId: davidKumar.id, videoId: 7, percentWatched: 75, status: 'STARTED' as const, watchedAt: daysAgo(7) },
+    { userId: davidKumar.id, videoId: 2, percentWatched: 90, status: 'STARTED' as const, watchedAt: daysAgo(5) },
+    { userId: davidKumar.id, videoId: 4, percentWatched: 50, status: 'STARTED' as const, watchedAt: daysAgo(3) },
+    { userId: davidKumar.id, videoId: 3, percentWatched: 40, status: 'STARTED' as const, watchedAt: daysAgo(1) },
+  ];
+
+  const allHistory = [...alexHistory, ...mayaHistory, ...jordanHistory, ...sarahHistory, ...davidHistory];
+  
+  await prisma.userVideoHistory.createMany({
+    data: allHistory,
+    skipDuplicates: true
   });
 
-  const dataProject = await prisma.project.create({
-    data: {
-      title: 'Customer Analytics Dashboard',
-      description: 'Create an interactive dashboard analyzing customer behavior using Python, pandas, and visualization libraries. Apply data analysis techniques from the course.',
-      deadline: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000), // 45 days from now
-      userId: instructor2.id,
-      courseId: dataAnalysisCourse.id // Link to Data Analysis course
-    }
-  });
+  console.log(`✅ Created ${allHistory.length} video history entries for demo users`);
 
-  console.log(`✅ Created sample projects: ${sampleProject.title}, ${dataProject.title}`);
+  // Step 10: Seed Projects for Demo Users
+  console.log('📋 Seeding Projects for Demo Users...');
+
+  // Alex Chen Projects - 3 active, high engagement
+  const alexProjects = [
+    {
+      title: 'Personal Portfolio Website',
+      description: 'Modern portfolio showcasing my web development projects with interactive animations and responsive design.',
+      deadline: new Date(now.getTime() + 15 * 24 * 60 * 60 * 1000),
+      userId: alexChen.id,
+      courseId: webDevCourse.id,
+      createdAt: daysAgo(30)
+    },
+    {
+      title: 'React Design System',
+      description: 'Component library with reusable UI components following Material Design principles.',
+      deadline: new Date(now.getTime() + 25 * 24 * 60 * 60 * 1000),
+      userId: alexChen.id,
+      courseId: webDevCourse.id,
+      createdAt: daysAgo(20)
+    },
+    {
+      title: 'E-commerce Dashboard',
+      description: 'Admin dashboard for managing products, orders, and customers with real-time analytics.',
+      deadline: new Date(now.getTime() + 40 * 24 * 60 * 60 * 1000),
+      userId: alexChen.id,
+      courseId: webDevCourse.id,
+      createdAt: daysAgo(10)
+    }
+  ];
+
+  // Maya Rodriguez Projects - 2 active
+  const mayaProjects = [
+    {
+      title: 'REST API for Mobile App',
+      description: 'Building a scalable Node.js API with authentication, rate limiting, and comprehensive documentation.',
+      deadline: new Date(now.getTime() + 20 * 24 * 60 * 60 * 1000),
+      userId: mayaRodriguez.id,
+      courseId: webDevCourse.id,
+      createdAt: daysAgo(25)
+    },
+    {
+      title: 'Database Optimization Project',
+      description: 'Improving query performance and implementing caching strategies for high-traffic application.',
+      deadline: new Date(now.getTime() + 35 * 24 * 60 * 60 * 1000),
+      userId: mayaRodriguez.id,
+      courseId: dataAnalysisCourse.id,
+      createdAt: daysAgo(15)
+    }
+  ];
+
+  // Jordan Park Projects - 4 active, very high engagement
+  const jordanProjects = [
+    {
+      title: 'Full-Stack Todo Application',
+      description: 'Complete task management app with React frontend, Express backend, and MongoDB database.',
+      deadline: new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000),
+      userId: jordanPark.id,
+      courseId: webDevCourse.id,
+      createdAt: daysAgo(50)
+    },
+    {
+      title: 'Real-time Chat Application',
+      description: 'WebSocket-based chat with rooms, file sharing, and user presence indicators.',
+      deadline: new Date(now.getTime() + 18 * 24 * 60 * 60 * 1000),
+      userId: jordanPark.id,
+      courseId: webDevCourse.id,
+      createdAt: daysAgo(40)
+    },
+    {
+      title: 'Weather Dashboard Widget',
+      description: 'Interactive weather visualization with API integration and location-based forecasts.',
+      deadline: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000),
+      userId: jordanPark.id,
+      courseId: webDevCourse.id,
+      createdAt: daysAgo(25)
+    },
+    {
+      title: 'Expense Tracker Mobile App',
+      description: 'React Native app for tracking personal finances with charts and budget alerts.',
+      deadline: new Date(now.getTime() + 45 * 24 * 60 * 60 * 1000),
+      userId: jordanPark.id,
+      courseId: webDevCourse.id,
+      createdAt: daysAgo(15)
+    }
+  ];
+
+  // Sarah Thompson Projects - 1 active, new user
+  const sarahProjects = [
+    {
+      title: 'My First Full-Stack App',
+      description: 'Learning project: Building a simple blog application with user authentication and CRUD operations.',
+      deadline: new Date(now.getTime() + 60 * 24 * 60 * 60 * 1000),
+      userId: sarahThompson.id,
+      courseId: webDevCourse.id,
+      createdAt: daysAgo(5)
+    }
+  ];
+
+  // David Kumar Projects - 3 active
+  const davidProjects = [
+    {
+      title: 'Research Data Dashboard',
+      description: 'Interactive visualization of research data using D3.js and Python backend for analysis.',
+      deadline: new Date(now.getTime() + 22 * 24 * 60 * 60 * 1000),
+      userId: davidKumar.id,
+      courseId: dataAnalysisCourse.id,
+      createdAt: daysAgo(35)
+    },
+    {
+      title: 'Machine Learning Model Pipeline',
+      description: 'End-to-end ML pipeline for predicting student performance with automated data preprocessing.',
+      deadline: new Date(now.getTime() + 38 * 24 * 60 * 60 * 1000),
+      userId: davidKumar.id,
+      courseId: dataAnalysisCourse.id,
+      createdAt: daysAgo(28)
+    },
+    {
+      title: 'Data ETL Pipeline',
+      description: 'Automated data extraction, transformation, and loading system for research database.',
+      deadline: new Date(now.getTime() + 50 * 24 * 60 * 60 * 1000),
+      userId: davidKumar.id,
+      courseId: dataAnalysisCourse.id,
+      createdAt: daysAgo(20)
+    }
+  ];
+
+  const allProjects = [...alexProjects, ...mayaProjects, ...jordanProjects, ...sarahProjects, ...davidProjects];
+  
+  const createdProjects = [];
+  for (const projectData of allProjects) {
+    const project = await prisma.project.create({ data: projectData });
+    createdProjects.push(project);
+  }
+
+  console.log(`✅ Created ${createdProjects.length} projects for demo users`);
+
+  // Step 11: Seed Milestones for Projects
+  console.log('🎯 Seeding Milestones for Projects...');
+
+  const milestones = [
+    // Alex Chen - Portfolio Project (Project 1) - High completion
+    { projectId: createdProjects[0].id, title: 'Design mockups', dueDate: daysAgo(25), status: 'COMPLETED' as const },
+    { projectId: createdProjects[0].id, title: 'Setup project structure', dueDate: daysAgo(20), status: 'COMPLETED' as const },
+    { projectId: createdProjects[0].id, title: 'Build homepage', dueDate: daysAgo(15), status: 'COMPLETED' as const },
+    { projectId: createdProjects[0].id, title: 'Add project gallery', dueDate: daysAgo(10), status: 'COMPLETED' as const },
+    { projectId: createdProjects[0].id, title: 'Implement animations', dueDate: new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000), status: 'PENDING' as const },
+    { projectId: createdProjects[0].id, title: 'Deploy to production', dueDate: new Date(now.getTime() + 15 * 24 * 60 * 60 * 1000), status: 'PENDING' as const },
+
+    // Alex Chen - Design System (Project 2) - In progress
+    { projectId: createdProjects[1].id, title: 'Define color palette', dueDate: daysAgo(18), status: 'COMPLETED' as const },
+    { projectId: createdProjects[1].id, title: 'Create button components', dueDate: daysAgo(12), status: 'COMPLETED' as const },
+    { projectId: createdProjects[1].id, title: 'Build form components', dueDate: new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000), status: 'PENDING' as const },
+    { projectId: createdProjects[1].id, title: 'Add documentation', dueDate: new Date(now.getTime() + 25 * 24 * 60 * 60 * 1000), status: 'PENDING' as const },
+
+    // Alex Chen - E-commerce Dashboard (Project 3) - Just started
+    { projectId: createdProjects[2].id, title: 'Project planning', dueDate: daysAgo(8), status: 'COMPLETED' as const },
+    { projectId: createdProjects[2].id, title: 'Database schema design', dueDate: new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000), status: 'PENDING' as const },
+    { projectId: createdProjects[2].id, title: 'Setup authentication', dueDate: new Date(now.getTime() + 15 * 24 * 60 * 60 * 1000), status: 'PENDING' as const },
+
+    // Maya Rodriguez - REST API (Project 4) - Good progress
+    { projectId: createdProjects[3].id, title: 'API architecture design', dueDate: daysAgo(22), status: 'COMPLETED' as const },
+    { projectId: createdProjects[3].id, title: 'Setup Express server', dueDate: daysAgo(18), status: 'COMPLETED' as const },
+    { projectId: createdProjects[3].id, title: 'Implement authentication', dueDate: daysAgo(10), status: 'COMPLETED' as const },
+    { projectId: createdProjects[3].id, title: 'Add rate limiting', dueDate: new Date(now.getTime() + 8 * 24 * 60 * 60 * 1000), status: 'PENDING' as const },
+    { projectId: createdProjects[3].id, title: 'Write API documentation', dueDate: new Date(now.getTime() + 20 * 24 * 60 * 60 * 1000), status: 'PENDING' as const },
+
+    // Maya Rodriguez - Database Optimization (Project 5) - Early stage
+    { projectId: createdProjects[4].id, title: 'Performance audit', dueDate: daysAgo(12), status: 'COMPLETED' as const },
+    { projectId: createdProjects[4].id, title: 'Add database indexes', dueDate: new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000), status: 'PENDING' as const },
+    { projectId: createdProjects[4].id, title: 'Implement Redis caching', dueDate: new Date(now.getTime() + 25 * 24 * 60 * 60 * 1000), status: 'PENDING' as const },
+
+    // Jordan Park - Todo App (Project 6) - Almost complete
+    { projectId: createdProjects[5].id, title: 'Setup React + Express', dueDate: daysAgo(48), status: 'COMPLETED' as const },
+    { projectId: createdProjects[5].id, title: 'Build CRUD operations', dueDate: daysAgo(42), status: 'COMPLETED' as const },
+    { projectId: createdProjects[5].id, title: 'Add user authentication', dueDate: daysAgo(35), status: 'COMPLETED' as const },
+    { projectId: createdProjects[5].id, title: 'Implement drag & drop', dueDate: daysAgo(28), status: 'COMPLETED' as const },
+    { projectId: createdProjects[5].id, title: 'Polish UI/UX', dueDate: new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000), status: 'PENDING' as const },
+    { projectId: createdProjects[5].id, title: 'Deploy & test', dueDate: new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000), status: 'PENDING' as const },
+
+    // Jordan Park - Chat App (Project 7) - Good progress
+    { projectId: createdProjects[6].id, title: 'Setup WebSocket server', dueDate: daysAgo(38), status: 'COMPLETED' as const },
+    { projectId: createdProjects[6].id, title: 'Build chat rooms', dueDate: daysAgo(30), status: 'COMPLETED' as const },
+    { projectId: createdProjects[6].id, title: 'Add file uploads', dueDate: new Date(now.getTime() + 8 * 24 * 60 * 60 * 1000), status: 'PENDING' as const },
+    { projectId: createdProjects[6].id, title: 'Implement notifications', dueDate: new Date(now.getTime() + 18 * 24 * 60 * 60 * 1000), status: 'PENDING' as const },
+
+    // Jordan Park - Weather Dashboard (Project 8)
+    { projectId: createdProjects[7].id, title: 'API integration', dueDate: daysAgo(22), status: 'COMPLETED' as const },
+    { projectId: createdProjects[7].id, title: 'Build weather cards', dueDate: daysAgo(15), status: 'COMPLETED' as const },
+    { projectId: createdProjects[7].id, title: 'Add location search', dueDate: new Date(now.getTime() + 12 * 24 * 60 * 60 * 1000), status: 'PENDING' as const },
+    { projectId: createdProjects[7].id, title: 'Create forecast charts', dueDate: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000), status: 'PENDING' as const },
+
+    // Jordan Park - Expense Tracker (Project 9) - Just started
+    { projectId: createdProjects[8].id, title: 'Setup React Native', dueDate: daysAgo(12), status: 'COMPLETED' as const },
+    { projectId: createdProjects[8].id, title: 'Build expense form', dueDate: new Date(now.getTime() + 15 * 24 * 60 * 60 * 1000), status: 'PENDING' as const },
+    { projectId: createdProjects[8].id, title: 'Add chart visualizations', dueDate: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000), status: 'PENDING' as const },
+
+    // Sarah Thompson - First App (Project 10) - Early stage
+    { projectId: createdProjects[9].id, title: 'Learn HTML/CSS basics', dueDate: daysAgo(3), status: 'COMPLETED' as const },
+    { projectId: createdProjects[9].id, title: 'Setup development environment', dueDate: daysAgo(1), status: 'COMPLETED' as const },
+    { projectId: createdProjects[9].id, title: 'Create database schema', dueDate: new Date(now.getTime() + 20 * 24 * 60 * 60 * 1000), status: 'PENDING' as const },
+    { projectId: createdProjects[9].id, title: 'Build authentication', dueDate: new Date(now.getTime() + 40 * 24 * 60 * 60 * 1000), status: 'PENDING' as const },
+    { projectId: createdProjects[9].id, title: 'Add CRUD operations', dueDate: new Date(now.getTime() + 60 * 24 * 60 * 60 * 1000), status: 'PENDING' as const },
+
+    // David Kumar - Research Dashboard (Project 11)
+    { projectId: createdProjects[10].id, title: 'Data collection setup', dueDate: daysAgo(32), status: 'COMPLETED' as const },
+    { projectId: createdProjects[10].id, title: 'Build Python backend', dueDate: daysAgo(25), status: 'COMPLETED' as const },
+    { projectId: createdProjects[10].id, title: 'Create D3.js visualizations', dueDate: daysAgo(15), status: 'COMPLETED' as const },
+    { projectId: createdProjects[10].id, title: 'Add filtering options', dueDate: new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000), status: 'PENDING' as const },
+    { projectId: createdProjects[10].id, title: 'Deploy to university server', dueDate: new Date(now.getTime() + 22 * 24 * 60 * 60 * 1000), status: 'PENDING' as const },
+
+    // David Kumar - ML Model (Project 12)
+    { projectId: createdProjects[11].id, title: 'Data preprocessing', dueDate: daysAgo(26), status: 'COMPLETED' as const },
+    { projectId: createdProjects[11].id, title: 'Feature engineering', dueDate: daysAgo(18), status: 'COMPLETED' as const },
+    { projectId: createdProjects[11].id, title: 'Train initial model', dueDate: new Date(now.getTime() + 15 * 24 * 60 * 60 * 1000), status: 'PENDING' as const },
+    { projectId: createdProjects[11].id, title: 'Hyperparameter tuning', dueDate: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000), status: 'PENDING' as const },
+
+    // David Kumar - ETL Pipeline (Project 13)
+    { projectId: createdProjects[12].id, title: 'Design pipeline architecture', dueDate: daysAgo(18), status: 'COMPLETED' as const },
+    { projectId: createdProjects[12].id, title: 'Build data extractors', dueDate: new Date(now.getTime() + 12 * 24 * 60 * 60 * 1000), status: 'PENDING' as const },
+    { projectId: createdProjects[12].id, title: 'Add transformation logic', dueDate: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000), status: 'PENDING' as const },
+    { projectId: createdProjects[12].id, title: 'Schedule automated runs', dueDate: new Date(now.getTime() + 50 * 24 * 60 * 60 * 1000), status: 'PENDING' as const },
+  ];
+
+  await prisma.milestone.createMany({ data: milestones });
+
+  console.log(`✅ Created ${milestones.length} milestones for projects`);
+
+  // Step 12: Seed Accountability Fees for Select Projects
+  console.log('💰 Seeding Accountability Fees...');
+
+  const fees = [
+    // Maya Rodriguez - Completed project with refunded fee
+    { userId: mayaRodriguez.id, projectId: createdProjects[3].id, amount: 500, status: 'LOCKED' as const },
+    
+    // Jordan Park - Completed projects
+    { userId: jordanPark.id, projectId: createdProjects[5].id, amount: 1000, status: 'LOCKED' as const },
+    { userId: jordanPark.id, projectId: createdProjects[6].id, amount: 750, status: 'LOCKED' as const },
+    
+    // David Kumar - Active project
+    { userId: davidKumar.id, projectId: createdProjects[10].id, amount: 800, status: 'LOCKED' as const },
+  ];
+
+  await prisma.accountabilityFee.createMany({ data: fees });
+
+  console.log(`✅ Created ${fees.length} accountability fees`);
+
+  // Step 13: Seed Reminders for Upcoming Milestones
+  console.log('🔔 Seeding Reminders for Upcoming Milestones...');
+
+  const upcomingMilestones = milestones.filter(m => m.status === 'PENDING' && m.dueDate);
+  const reminders = [];
+
+  for (const milestone of upcomingMilestones.slice(0, 15)) { // Add reminders for first 15 upcoming milestones
+    const project = createdProjects.find(p => p.id === milestone.projectId);
+    if (project && milestone.dueDate) {
+      // Email reminder 2 days before
+      reminders.push({
+        userId: project.userId,
+        milestoneId: milestone.id,
+        channel: 'email',
+        sendDate: new Date(milestone.dueDate.getTime() - 2 * 24 * 60 * 60 * 1000),
+        status: 'SCHEDULED' as const
+      });
+      
+      // WhatsApp reminder on due date
+      reminders.push({
+        userId: project.userId,
+        milestoneId: milestone.id,
+        channel: 'whatsapp',
+        sendDate: milestone.dueDate,
+        status: 'SCHEDULED' as const
+      });
+    }
+  }
+
+  await prisma.reminder.createMany({ data: reminders });
+
+  console.log(`✅ Created ${reminders.length} reminders for upcoming milestones`);
 
   // Summary
   console.log('\n🎉 Database seeding completed successfully!');
@@ -326,18 +741,29 @@ async function main() {
   console.log(`   • Learning Types: 3 (Visual, Auditory, Kinesthetic)`);
   console.log(`   • Videos: ${videos.length} sample videos with realistic content`);
   console.log(`   • Video Tags: ${videoTags.length} tags with learning type scores`);
+  console.log(`   • Demo Users: 5 diverse personas (Alex, Maya, Jordan, Sarah, David)`);
   console.log(`   • Instructors: 2 sample instructors`);
   console.log(`   • Courses: 2 sample courses`);
   console.log(`   • Lessons: ${allLessons.length} course lessons`);
   console.log(`   • Tracks: 2 sample tracks`);
   console.log(`   • Track-Course Relations: ${trackCourseRelations.length} relationships`);
-  console.log(`   • Projects: 2 sample projects (linked to courses)`);
-  console.log('\n🚀 Your Clario database is now ready for testing!');
+  console.log(`   • Video History: ${allHistory.length} watch history entries`);
+  console.log(`   • Projects: ${createdProjects.length} projects for demo users`);
+  console.log(`   • Milestones: ${milestones.length} project milestones`);
+  console.log(`   • Accountability Fees: ${fees.length} fees`);
+  console.log(`   • Reminders: ${reminders.length} scheduled reminders`);
+  console.log('\n👥 Demo User Personas:');
+  console.log('   1. Alex Chen (alex.chen@clario-demo.com) - Visual, College Student, High Engagement');
+  console.log('   2. Maya Rodriguez (maya.rodriguez@clario-demo.com) - Auditory, Professional, Medium Engagement');
+  console.log('   3. Jordan Park (jordan.park@clario-demo.com) - Kinesthetic, Developer, Very High Engagement');
+  console.log('   4. Sarah Thompson (sarah.thompson@clario-demo.com) - Visual, Career Switcher, New User');
+  console.log('   5. David Kumar (david.kumar@clario-demo.com) - Auditory, Graduate Student, Medium-High Engagement');
+  console.log('\n🚀 Your Clario database is now ready for MVP demo!');
   console.log('\n💡 Next steps:');
-  console.log('   1. Test the unified course system across Learn, Tracks, and Projects');
-  console.log('   2. Test the video search and scoring algorithms');
-  console.log('   3. Create test users with different learning types');
-  console.log('   4. Verify personalized recommendations work correctly');
+  console.log('   1. Run the backend server: npm run dev');
+  console.log('   2. Run the frontend: npm run dev (in frontend folder)');
+  console.log('   3. Test login with any demo user email');
+  console.log('   4. Showcase personalized recommendations and project management');
 }
 
 main()

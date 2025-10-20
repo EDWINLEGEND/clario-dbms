@@ -47,6 +47,8 @@ const floatingVariants = {
 };
 
 export default function LoginPage() {
+  // Render a safe fallback if Google OAuth isn't configured
+  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { ref: glazeRef } = useGlaze({ enableMouseTracking: true });
@@ -138,6 +140,30 @@ export default function LoginPage() {
       variant: "default",
     });
   };
+
+  // Hard guard: show a minimal UI instead of blank when env is missing
+  if (!googleClientId) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black p-4">
+        <Card className="border-white/10 bg-black backdrop-blur-xl max-w-md w-full">
+          <CardHeader className="text-center space-y-4">
+            <CardTitle className="text-2xl font-bold text-white">Login</CardTitle>
+            <CardDescription className="text-white/70">
+              Google OAuth is not configured. Set NEXT_PUBLIC_GOOGLE_CLIENT_ID in .env.local.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Button
+              disabled
+              className="w-full bg-white text-black"
+            >
+              Sign in with Google
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black p-4 relative overflow-hidden">

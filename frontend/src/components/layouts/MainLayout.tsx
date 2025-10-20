@@ -3,6 +3,7 @@
 import { ReactNode } from "react";
 import { User } from "@/types";
 import { cn } from "@/lib/utils";
+import { DemoUserSelector } from "@/components/demo/DemoUserSelector";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -19,6 +20,9 @@ export function MainLayout({
   showHeader = false,
   className,
 }: MainLayoutProps) {
+  // Show demo selector in development or when demo mode is enabled
+  const showDemoSelector = process.env.NODE_ENV === 'development' || process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
+
   return (
     <div className="min-h-screen bg-background">
       {/* Main content - no bottom padding needed since FloatingBottomNav is in root layout */}
@@ -30,6 +34,9 @@ export function MainLayout({
       >
         {children}
       </main>
+      
+      {/* Demo User Selector - only in development or demo mode */}
+      {showDemoSelector && <DemoUserSelector />}
     </div>
   );
 }

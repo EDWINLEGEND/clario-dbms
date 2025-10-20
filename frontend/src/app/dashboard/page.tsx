@@ -256,64 +256,64 @@ function DashboardContent() {
   };
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
       <motion.div
-        className="max-w-7xl mx-auto p-6 space-y-8"
+        className="max-w-7xl mx-auto p-4 md:p-6 lg:p-8 space-y-6 md:space-y-8"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
         {/* User Profile Header */}
         <motion.div variants={itemVariants}>
-          <Card className="border-white/10 bg-black interactive-glow">
-            <CardContent className="p-8">
+          <Card className="border-white/10 bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-xl interactive-glow shadow-2xl">
+            <CardContent className="p-6 md:p-8">
               <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
                 <div className="flex items-center gap-6">
-                  <Avatar className="w-20 h-20 border-4 border-white/20">
+                  <Avatar className="w-20 h-20 md:w-24 md:h-24 border-4 border-white/30 shadow-xl ring-2 ring-white/10">
                     <AvatarImage src={mockUser.avatar} />
-                    <AvatarFallback className="bg-white/10 text-white text-2xl font-bold">
+                    <AvatarFallback className="bg-gradient-to-br from-white/20 to-white/10 text-white text-2xl md:text-3xl font-bold">
                       {mockUser.name.split(' ').map(n => n[0]).join('')}
                     </AvatarFallback>
                   </Avatar>
                   
-                  <div className="space-y-2">
-                    <h1 className="text-3xl font-bold text-white">
+                  <div className="space-y-3">
+                    <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white bg-gradient-to-r from-white to-white/80 bg-clip-text">
                       Welcome back, {mockUser.name.split(' ')[0]}!
                     </h1>
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-2">
-                        <Flame className="h-5 w-5 text-orange-500" />
-                        <span className="text-lg font-bold text-white">
-                          🔥 {mockUser.streak} Day Streak
+                    <div className="flex items-center gap-3 md:gap-4 flex-wrap">
+                      <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30">
+                        <Flame className="h-4 w-4 md:h-5 md:w-5 text-orange-400" />
+                        <span className="text-sm md:text-base font-bold text-orange-100">
+                          {mockUser.streak} Day Streak
                         </span>
                       </div>
-                      <Badge variant="outline" className="border-white/20 text-white font-bold">
+                      <Badge variant="outline" className="border-white/30 bg-white/5 text-white font-bold px-3 py-1 text-sm">
                         Level {mockUser.level}
                       </Badge>
                     </div>
                     
                     {/* XP Progress */}
-                    <div className="space-y-1">
+                    <div className="space-y-2 min-w-[200px] md:min-w-[280px]">
                       <div className="flex justify-between text-sm">
-                        <span className="text-white/60">XP Progress</span>
+                        <span className="text-white/70 font-medium">XP Progress</span>
                         <span className="font-bold text-white">
                           {mockUser.xp}/{mockUser.nextLevelXp}
                         </span>
                       </div>
                       <Progress 
                         value={(mockUser.xp / mockUser.nextLevelXp) * 100} 
-                        className="h-2 bg-white/20"
+                        className="h-2.5 bg-white/10 shadow-inner"
                       />
                     </div>
                   </div>
                 </div>
                 
-                <div className="flex gap-3">
-                  <Button variant="outline" className="border-white/20 text-white hover:bg-white/10">
+                <div className="flex gap-3 flex-wrap">
+                  <Button variant="outline" className="border-white/30 bg-white/5 text-white hover:bg-white/10 hover:border-white/50 transition-all shadow-lg">
                     <Calendar className="h-4 w-4 mr-2" />
                     Schedule
                   </Button>
-                  <Button className="bg-white text-black hover:bg-white/90">
+                  <Button className="bg-gradient-to-r from-white to-gray-100 text-black hover:from-gray-100 hover:to-white shadow-xl hover:shadow-2xl transition-all">
                     <Target className="h-4 w-4 mr-2" />
                     Set Goals
                   </Button>
@@ -383,12 +383,12 @@ function DashboardContent() {
               </motion.div>
 
               {/* Main Content Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
                 {/* In Progress Section */}
                 <motion.div className="lg:col-span-2 space-y-6" variants={itemVariants}>
                   <div className="flex items-center justify-between">
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Continue Learning</h2>
-                    <Button variant="ghost" asChild className="text-gray-700 hover:bg-gray-100">
+                    <h2 className="text-xl md:text-2xl font-bold text-white">Continue Learning</h2>
+                    <Button variant="ghost" asChild className="text-white/70 hover:text-white hover:bg-white/10 transition-all">
                       <Link href="/learn">
                         View All <ArrowRight className="h-4 w-4 ml-2" />
                       </Link>
@@ -403,25 +403,25 @@ function DashboardContent() {
                           key={`skeleton-${index}`}
                           variants={itemVariants}
                         >
-                          <Card className="border-2 border-gray-200">
-                            <CardContent className="p-6">
-                              <div className="flex items-center gap-6">
-                                <div className="w-20 h-20 rounded-lg bg-gray-200 animate-pulse flex-shrink-0" />
+                          <Card className="border border-white/10 bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm">
+                            <CardContent className="p-4 md:p-6">
+                              <div className="flex items-center gap-4 md:gap-6">
+                                <div className="w-16 h-16 md:w-20 md:h-20 rounded-lg bg-white/10 animate-pulse flex-shrink-0" />
                                 <div className="flex-1 space-y-3">
                                   <div className="space-y-2">
-                                    <div className="h-5 bg-gray-200 rounded animate-pulse w-3/4" />
-                                    <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2" />
+                                    <div className="h-4 md:h-5 bg-white/10 rounded animate-pulse w-3/4" />
+                                    <div className="h-3 md:h-4 bg-white/10 rounded animate-pulse w-1/2" />
                                   </div>
                                   <div className="space-y-2">
                                     <div className="flex justify-between">
-                                      <div className="h-3 bg-gray-200 rounded animate-pulse w-16" />
-                                      <div className="h-3 bg-gray-200 rounded animate-pulse w-12" />
+                                      <div className="h-3 bg-white/10 rounded animate-pulse w-16" />
+                                      <div className="h-3 bg-white/10 rounded animate-pulse w-12" />
                                     </div>
-                                    <div className="h-2 bg-gray-200 rounded animate-pulse" />
+                                    <div className="h-2 bg-white/10 rounded animate-pulse" />
                                   </div>
                                   <div className="flex items-center justify-between">
-                                    <div className="h-3 bg-gray-200 rounded animate-pulse w-20" />
-                                    <div className="h-8 bg-gray-200 rounded animate-pulse w-20" />
+                                    <div className="h-3 bg-white/10 rounded animate-pulse w-20" />
+                                    <div className="h-8 bg-white/10 rounded animate-pulse w-20" />
                                   </div>
                                 </div>
                               </div>
@@ -435,50 +435,51 @@ function DashboardContent() {
                         <motion.div
                           key={history.id}
                           variants={itemVariants}
-                          whileHover={{ scale: 1.02 }}
+                          whileHover={{ scale: 1.02, y: -4 }}
                           whileTap={{ scale: 0.98 }}
+                          transition={{ type: "spring", stiffness: 300, damping: 20 }}
                         >
-                          <Card className="border-2 border-gray-200 hover:border-black transition-all duration-300">
-                            <CardContent className="p-6">
-                              <div className="flex items-center gap-6">
-                                <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 border-2 border-gray-200">
+                          <Card className="border border-white/10 bg-gradient-to-br from-white/5 to-white/[0.02] hover:from-white/10 hover:to-white/5 hover:border-white/20 transition-all duration-300 shadow-xl hover:shadow-2xl backdrop-blur-sm">
+                            <CardContent className="p-4 md:p-6">
+                              <div className="flex items-center gap-4 md:gap-6">
+                                <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden flex-shrink-0 border-2 border-white/20 shadow-lg">
                                   <img
                                     src={history.video.thumbnailUrl || "/test.jpg"}
                                     alt={history.video.title}
                                     className="w-full h-full object-cover"
                                   />
-                                  <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                                    <Play className="h-6 w-6 text-white" />
+                                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                                    <Play className="h-6 w-6 md:h-8 md:w-8 text-white drop-shadow-lg" />
                                   </div>
                                 </div>
                                 
-                                <div className="flex-1 space-y-3">
+                                <div className="flex-1 space-y-3 min-w-0">
                                   <div>
-                                    <h3 className="text-lg font-bold text-black">{history.video.title}</h3>
-                                    <p className="text-sm text-gray-600">
+                                    <h3 className="text-base md:text-lg font-bold text-white truncate">{history.video.title}</h3>
+                                    <p className="text-xs md:text-sm text-white/60">
                                       Last watched: {new Date(history.updatedAt).toLocaleDateString()}
                                     </p>
                                   </div>
                                   
                                   <div className="space-y-2">
-                                    <div className="flex justify-between text-sm">
-                                      <span className="text-gray-600">Progress</span>
-                                      <span className="font-bold text-black">{Math.round(history.percentWatched)}%</span>
+                                    <div className="flex justify-between text-xs md:text-sm">
+                                      <span className="text-white/70">Progress</span>
+                                      <span className="font-bold text-white">{Math.round(history.percentWatched)}%</span>
                                     </div>
-                                    <Progress value={history.percentWatched} className="h-2 bg-gray-200" />
+                                    <Progress value={history.percentWatched} className="h-2 bg-white/10" />
                                   </div>
                                   
                                   <div className="flex items-center justify-between">
-                                    <span className="text-xs text-gray-500">
+                                    <span className="text-xs text-white/50">
                                       {history.video.duration ? `${Math.round(history.video.duration / 60)} min video` : 'Duration unknown'}
                                     </span>
                                     <Button 
                                       size="sm" 
-                                      className="bg-primary text-white hover:bg-primary/90"
+                                      className="bg-white text-black hover:bg-white/90 shadow-lg hover:shadow-xl transition-all"
                                       asChild
                                     >
                                       <Link href={`/learn/${history.videoId}`}>
-                                        <Play className="h-4 w-4 mr-2" />
+                                        <Play className="h-3 w-3 md:h-4 md:w-4 mr-1 md:mr-2" />
                                         {history.percentWatched >= 100 ? 'Rewatch' : 'Continue'}
                                       </Link>
                                     </Button>
@@ -495,50 +496,51 @@ function DashboardContent() {
                         <motion.div
                           key={course.id}
                           variants={itemVariants}
-                          whileHover={{ scale: 1.02 }}
+                          whileHover={{ scale: 1.02, y: -4 }}
                           whileTap={{ scale: 0.98 }}
+                          transition={{ type: "spring", stiffness: 300, damping: 20 }}
                         >
-                          <Card className="border-2 border-gray-200 hover:border-black transition-all duration-300">
-                            <CardContent className="p-6">
-                              <div className="flex items-center gap-6">
-                                <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 border-2 border-gray-200">
+                          <Card className="border border-white/10 bg-gradient-to-br from-white/5 to-white/[0.02] hover:from-white/10 hover:to-white/5 hover:border-white/20 transition-all duration-300 shadow-xl hover:shadow-2xl backdrop-blur-sm">
+                            <CardContent className="p-4 md:p-6">
+                              <div className="flex items-center gap-4 md:gap-6">
+                                <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden flex-shrink-0 border-2 border-white/20 shadow-lg">
                                   <img
                                     src={course.thumbnail}
                                     alt={course.title}
                                     className="w-full h-full object-cover"
                                   />
-                                  <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                                    <Play className="h-6 w-6 text-white" />
+                                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                                    <Play className="h-6 w-6 md:h-8 md:w-8 text-white drop-shadow-lg" />
                                   </div>
                                 </div>
                                 
-                                <div className="flex-1 space-y-3">
+                                <div className="flex-1 space-y-3 min-w-0">
                                   <div>
-                                    <h3 className="text-lg font-bold text-black">{course.title}</h3>
-                                    <p className="text-sm text-gray-600">
+                                    <h3 className="text-base md:text-lg font-bold text-white truncate">{course.title}</h3>
+                                    <p className="text-xs md:text-sm text-white/60">
                                       by {course.instructor} • Next: {course.nextLesson}
                                     </p>
                                   </div>
                                   
                                   <div className="space-y-2">
-                                    <div className="flex justify-between text-sm">
-                                      <span className="text-gray-600">Progress</span>
-                                      <span className="font-bold text-black">{course.progress}%</span>
+                                    <div className="flex justify-between text-xs md:text-sm">
+                                      <span className="text-white/70">Progress</span>
+                                      <span className="font-bold text-white">{course.progress}%</span>
                                     </div>
-                                    <Progress value={course.progress} className="h-2 bg-gray-200" />
+                                    <Progress value={course.progress} className="h-2 bg-white/10" />
                                   </div>
                                   
                                   <div className="flex items-center justify-between">
-                                    <span className="text-xs text-gray-500">
+                                    <span className="text-xs text-white/50">
                                       {Math.round(course.timeSpent / 60)}h of {Math.round(course.totalDuration / 60)}h
                                     </span>
                                     <Button 
                                       size="sm" 
-                                      className="bg-primary text-white hover:bg-primary/90"
+                                      className="bg-white text-black hover:bg-white/90 shadow-lg hover:shadow-xl transition-all"
                                       asChild
                                     >
                                       <Link href={`/courses/${course.id}`}>
-                                        <Play className="h-4 w-4 mr-2" />
+                                        <Play className="h-3 w-3 md:h-4 md:w-4 mr-1 md:mr-2" />
                                         Resume
                                       </Link>
                                     </Button>
@@ -556,17 +558,17 @@ function DashboardContent() {
                 {/* Sidebar */}
                 <motion.div className="space-y-6" variants={itemVariants}>
                   {/* Weekly Goal */}
-                  <Card className="border-2 border-gray-200">
+                  <Card className="border border-white/10 bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm shadow-xl">
                     <CardHeader className="pb-3">
-                      <CardTitle className="flex items-center gap-2 text-lg font-bold">
-                        <Target className="h-5 w-5" />
+                      <CardTitle className="flex items-center gap-2 text-base md:text-lg font-bold text-white">
+                        <Target className="h-4 w-4 md:h-5 md:w-5 text-white/80" />
                         This Week's Goal
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="text-center">
-                        <div className="relative w-24 h-24 mx-auto">
-                          <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
+                        <div className="relative w-28 h-28 mx-auto">
+                          <svg className="w-28 h-28 transform -rotate-90" viewBox="0 0 100 100">
                             <circle
                               cx="50"
                               cy="50"
@@ -574,40 +576,46 @@ function DashboardContent() {
                               stroke="currentColor"
                               strokeWidth="8"
                               fill="transparent"
-                              className="text-gray-200"
+                              className="text-white/10"
                             />
                             <circle
                               cx="50"
                               cy="50"
                               r="40"
-                              stroke="currentColor"
+                              stroke="url(#gradient)"
                               strokeWidth="8"
                               fill="transparent"
                               strokeDasharray={`${2 * Math.PI * 40}`}
                               strokeDashoffset={`${2 * Math.PI * 40 * (1 - 0.75)}`}
-                              className="text-black"
+                              className="drop-shadow-lg"
                               strokeLinecap="round"
                             />
+                            <defs>
+                              <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.9" />
+                                <stop offset="100%" stopColor="#ffffff" stopOpacity="0.6" />
+                              </linearGradient>
+                            </defs>
                           </svg>
                           <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="text-xl font-black text-black">75%</span>
+                            <span className="text-2xl font-black text-white drop-shadow-lg">75%</span>
                           </div>
                         </div>
-                        <p className="text-sm text-gray-600 mt-2">
+                        <p className="text-sm text-white/70 mt-3">
                           5 hours completed of 7 hours goal
                         </p>
                       </div>
-                      <Button className="w-full bg-primary text-white hover:bg-primary/90">
+                      <Button className="w-full bg-white text-black hover:bg-white/90 shadow-lg hover:shadow-xl transition-all">
                         Update Goal
                       </Button>
                     </CardContent>
                   </Card>
 
                   {/* Recent Achievements */}
-                  <Card className="border-2 border-gray-200">
+                  <Card className="border border-white/10 bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm shadow-xl">
                     <CardHeader className="pb-3">
-                      <CardTitle className="flex items-center gap-2 text-lg font-bold">
-                        <Sparkles className="h-5 w-5" />
+                      <CardTitle className="flex items-center gap-2 text-base md:text-lg font-bold text-white">
+                        <Sparkles className="h-4 w-4 md:h-5 md:w-5 text-yellow-400" />
                         Recent Achievements
                       </CardTitle>
                     </CardHeader>
@@ -623,7 +631,7 @@ function DashboardContent() {
                       </div>
                       <Button 
                         variant="ghost" 
-                        className="w-full mt-4 text-gray-700 hover:bg-gray-100"
+                        className="w-full mt-4 text-white/70 hover:text-white hover:bg-white/10 transition-all"
                         asChild
                       >
                         <Link href="/achievements">
@@ -638,8 +646,8 @@ function DashboardContent() {
               {/* Achievements Section */}
               <motion.div variants={itemVariants}>
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Your Achievements</h2>
-                  <Button variant="ghost" className="text-gray-700 hover:bg-gray-100">
+                  <h2 className="text-xl md:text-2xl font-bold text-white">Your Achievements</h2>
+                  <Button variant="ghost" className="text-white/70 hover:text-white hover:bg-white/10 transition-all">
                     View All <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
                 </div>
@@ -657,19 +665,19 @@ function DashboardContent() {
             </TabsContent>
 
             {/* Profile Tab */}
-            <TabsContent value="profile" className="space-y-8 mt-8">
+            <TabsContent value="profile" className="space-y-6 md:space-y-8 mt-6 md:mt-8">
               <motion.div variants={itemVariants}>
-                <Card className="border-2 border-gray-200">
-                  <CardContent className="p-8">
+                <Card className="border border-white/10 bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm shadow-xl">
+                  <CardContent className="p-6 md:p-8">
                     <div className="space-y-6">
-                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                      <h2 className="text-xl md:text-2xl font-bold text-white">
                         Profile Information
                       </h2>
                       
                       <div className="flex flex-col lg:flex-row items-start lg:items-center gap-8">
-                        <Avatar className="w-32 h-32 border-4 border-black">
+                        <Avatar className="w-32 h-32 border-4 border-white/30 shadow-2xl ring-2 ring-white/10">
                           <AvatarImage src={mockUser.avatar} />
-                          <AvatarFallback className="bg-black text-white text-4xl font-bold">
+                          <AvatarFallback className="bg-gradient-to-br from-white/20 to-white/10 text-white text-4xl font-bold">
                             {mockUser.name.split(' ').map(n => n[0]).join('')}
                           </AvatarFallback>
                         </Avatar>
@@ -677,26 +685,26 @@ function DashboardContent() {
                         <div className="space-y-4 flex-1">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                              <Label className="text-sm font-medium text-gray-600">Full Name</Label>
-                              <p className="text-lg font-bold text-gray-900 dark:text-white mt-1">
+                              <Label className="text-sm font-medium text-white/70">Full Name</Label>
+                              <p className="text-lg font-bold text-white mt-1">
                                 {mockUser.name}
                               </p>
                             </div>
                             <div>
-                              <Label className="text-sm font-medium text-gray-600">Email</Label>
-                              <p className="text-lg text-gray-900 dark:text-white mt-1">
+                              <Label className="text-sm font-medium text-white/70">Email</Label>
+                              <p className="text-lg text-white mt-1">
                                 {mockUser.email}
                               </p>
                             </div>
                             <div>
-                              <Label className="text-sm font-medium text-gray-600">Level</Label>
-                              <p className="text-lg font-bold text-gray-900 dark:text-white mt-1">
+                              <Label className="text-sm font-medium text-white/70">Level</Label>
+                              <p className="text-lg font-bold text-white mt-1">
                                 Level {mockUser.level}
                               </p>
                             </div>
                             <div>
-                              <Label className="text-sm font-medium text-gray-600">Streak</Label>
-                              <p className="text-lg font-bold text-gray-900 dark:text-white mt-1">
+                              <Label className="text-sm font-medium text-white/70">Streak</Label>
+                              <p className="text-lg font-bold text-white mt-1">
                                 🔥 {mockUser.streak} Days
                               </p>
                             </div>
@@ -710,10 +718,10 @@ function DashboardContent() {
 
               {/* Achievements Section */}
               <motion.div variants={itemVariants}>
-                <Card className="border-2 border-gray-200">
-                  <CardContent className="p-8">
+                <Card className="border border-white/10 bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm shadow-xl">
+                  <CardContent className="p-6 md:p-8">
                     <div className="space-y-6">
-                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                      <h2 className="text-xl md:text-2xl font-bold text-white">
                         Your Achievements
                       </h2>
                       
@@ -735,32 +743,32 @@ function DashboardContent() {
             </TabsContent>
 
             {/* Settings Tab */}
-            <TabsContent value="settings" className="space-y-8 mt-8">
+            <TabsContent value="settings" className="space-y-6 md:space-y-8 mt-6 md:mt-8">
               {/* Update Profile Form */}
               <motion.div variants={itemVariants}>
-                <Card className="border-2 border-gray-200">
-                  <CardContent className="p-8">
+                <Card className="border border-white/10 bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm shadow-xl">
+                  <CardContent className="p-6 md:p-8">
                     <div className="space-y-6">
-                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                      <h2 className="text-xl md:text-2xl font-bold text-white">
                         Update Profile
                       </h2>
                       
                       <div className="space-y-4 max-w-md">
                         <div className="space-y-2">
-                          <Label htmlFor="profile-name" className="text-sm font-medium">
+                          <Label htmlFor="profile-name" className="text-sm font-medium text-white/70">
                             Full Name
                           </Label>
                           <Input
                             id="profile-name"
                             value={profileName}
                             onChange={(e) => setProfileName(e.target.value)}
-                            className="border-gray-300"
+                            className="border-white/20 bg-white/5 text-white placeholder:text-white/50"
                           />
                         </div>
                         
                         <Button 
                           onClick={handleProfileUpdate}
-                          className="bg-black text-white hover:bg-gray-800"
+                          className="bg-white text-black hover:bg-white/90 shadow-lg hover:shadow-xl transition-all"
                         >
                           <Save className="h-4 w-4 mr-2" />
                           Save Changes
@@ -773,21 +781,21 @@ function DashboardContent() {
 
               {/* Notification Settings */}
               <motion.div variants={itemVariants}>
-                <Card className="border-2 border-gray-200">
-                  <CardContent className="p-8">
+                <Card className="border border-white/10 bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm shadow-xl">
+                  <CardContent className="p-6 md:p-8">
                     <div className="space-y-6">
-                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                      <h2 className="text-xl md:text-2xl font-bold text-white">
                         Notification Preferences
                       </h2>
                       
                       <div className="space-y-6">
-                        <div className="flex items-center justify-between">
-                          <div className="space-y-1">
+                        <div className="flex items-center justify-between p-4 rounded-lg bg-white/5 border border-white/10">
+                          <div className="space-y-1 flex-1 pr-4">
                             <div className="flex items-center gap-2">
-                              <Bell className="h-4 w-4 text-gray-600" />
-                              <Label className="text-base font-medium">Email Reminders</Label>
+                              <Bell className="h-4 w-4 text-white/70" />
+                              <Label className="text-base font-medium text-white">Email Reminders</Label>
                             </div>
-                            <p className="text-sm text-gray-600">
+                            <p className="text-sm text-white/60">
                               Receive email notifications about course updates and deadlines
                             </p>
                           </div>
@@ -797,13 +805,13 @@ function DashboardContent() {
                           />
                         </div>
                         
-                        <div className="flex items-center justify-between">
-                          <div className="space-y-1">
+                        <div className="flex items-center justify-between p-4 rounded-lg bg-white/5 border border-white/10">
+                          <div className="space-y-1 flex-1 pr-4">
                             <div className="flex items-center gap-2">
-                              <Bell className="h-4 w-4 text-gray-600" />
-                              <Label className="text-base font-medium">WhatsApp Reminders</Label>
+                              <Bell className="h-4 w-4 text-white/70" />
+                              <Label className="text-base font-medium text-white">WhatsApp Reminders</Label>
                             </div>
-                            <p className="text-sm text-gray-600">
+                            <p className="text-sm text-white/60">
                               Get WhatsApp notifications for important updates
                             </p>
                           </div>
@@ -820,21 +828,21 @@ function DashboardContent() {
 
               {/* Account Management - Danger Zone */}
               <motion.div variants={itemVariants}>
-                <Card className="border-2 border-red-200 bg-red-50">
-                  <CardContent className="p-8">
+                <Card className="border-2 border-red-500/50 bg-gradient-to-br from-red-500/10 to-red-500/5 backdrop-blur-sm shadow-xl">
+                  <CardContent className="p-6 md:p-8">
                     <div className="space-y-6">
-                      <h2 className="text-2xl font-bold text-red-900">
+                      <h2 className="text-xl md:text-2xl font-bold text-red-400">
                         Account Management
                       </h2>
                       
                       <div className="space-y-4">
-                        <p className="text-red-700">
+                        <p className="text-red-300/90">
                           Danger Zone: These actions cannot be undone.
                         </p>
                         
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
-                            <Button variant="destructive" className="bg-red-600 hover:bg-red-700">
+                            <Button variant="destructive" className="bg-red-600 hover:bg-red-700 shadow-lg">
                               <Trash2 className="h-4 w-4 mr-2" />
                               Delete Account
                             </Button>

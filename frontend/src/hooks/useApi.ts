@@ -60,16 +60,23 @@ export function useVideos(query?: string, options?: Partial<UseQueryOptions<Vide
     queryFn: async (): Promise<Video[]> => {
       try {
         const token = localStorage.getItem('auth_token');
+        
+        // If no token, return empty array for demo
+        if (!token) {
+          return [];
+        }
+        
         if (query) {
-          const response = await apiClient.get(`/videos?search_query=${encodeURIComponent(query)}`, token || undefined);
+          const response = await apiClient.get(`/videos?search_query=${encodeURIComponent(query)}`, token);
           return response as Video[];
         } else {
-          const response = await apiClient.get('/videos', token || undefined);
+          const response = await apiClient.get('/videos', token);
           return response as Video[];
         }
       } catch (error) {
         console.error("Failed to fetch videos:", error);
-        throw error; // Re-throw the error so React Query can handle it
+        // Return empty array instead of throwing error for demo
+        return [];
       }
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -85,7 +92,13 @@ export function useVideoDetails(id: string, options?: Partial<UseQueryOptions<Vi
       // Try to get from backend, fallback to mock data
       try {
         const token = localStorage.getItem('auth_token');
-        const response = await apiClient.get(`/videos/${id}`, token || undefined);
+        
+        // If no token, return mock data for demo
+        if (!token) {
+          throw new Error('No authentication token');
+        }
+        
+        const response = await apiClient.get(`/videos/${id}`, token);
         return response as Video;
       } catch (error) {
         // Return mock data as fallback
@@ -134,11 +147,18 @@ export function useProjects(options?: Partial<UseQueryOptions<Project[], Error>>
     queryFn: async (): Promise<Project[]> => {
       try {
         const token = localStorage.getItem('auth_token');
-        const response = await apiClient.get('/projects', token || undefined);
+        
+        // If no token, return empty array for demo
+        if (!token) {
+          return [];
+        }
+        
+        const response = await apiClient.get('/projects', token);
         return response as Project[];
       } catch (error) {
         console.error("Failed to fetch projects:", error);
-        throw error; // Re-throw the error so React Query can handle it
+        // Return empty array instead of throwing error for demo
+        return [];
       }
     },
     staleTime: 2 * 60 * 1000, // 2 minutes - projects change more frequently

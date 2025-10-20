@@ -75,19 +75,19 @@ export default function ProjectsPage() {
 
   // Loading skeleton component
   const ProjectSkeleton = () => (
-    <Card className="bg-black border-white/10">
-      <CardContent className="p-6 space-y-4">
-        <Skeleton className="h-48 w-full bg-white/20" />
-        <Skeleton className="h-6 w-3/4 bg-white/20" />
-        <Skeleton className="h-4 w-full bg-white/20" />
-        <Skeleton className="h-4 w-2/3 bg-white/20" />
+    <Card className="bg-gradient-to-br from-white/5 to-white/[0.02] border-white/10 backdrop-blur-sm">
+      <CardContent className="p-4 md:p-6 space-y-4">
+        <Skeleton className="h-40 md:h-48 w-full bg-white/10 rounded-lg" />
+        <Skeleton className="h-5 md:h-6 w-3/4 bg-white/10" />
+        <Skeleton className="h-3 md:h-4 w-full bg-white/10" />
+        <Skeleton className="h-3 md:h-4 w-2/3 bg-white/10" />
         <div className="flex gap-2">
-          <Skeleton className="h-6 w-16 bg-white/20" />
-          <Skeleton className="h-6 w-20 bg-white/20" />
+          <Skeleton className="h-5 md:h-6 w-14 md:w-16 bg-white/10 rounded-full" />
+          <Skeleton className="h-5 md:h-6 w-16 md:w-20 bg-white/10 rounded-full" />
         </div>
         <div className="flex items-center justify-between pt-2">
-          <Skeleton className="h-4 w-24 bg-white/20" />
-          <Skeleton className="h-10 w-32 bg-white/20" />
+          <Skeleton className="h-3 md:h-4 w-20 md:w-24 bg-white/10" />
+          <Skeleton className="h-9 md:h-10 w-28 md:w-32 bg-white/10 rounded-md" />
         </div>
       </CardContent>
     </Card>
@@ -131,14 +131,14 @@ export default function ProjectsPage() {
 
   return (
     <MainLayout>
-      <div className="min-h-screen bg-black">
-          <div className="container mx-auto px-4 py-8">
+      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
+          <div className="container mx-auto px-4 py-6 md:py-8">
             {/* Header */}
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-white mb-2">
+            <div className="mb-6 md:mb-8">
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-2 md:mb-3">
                 My Projects
               </h1>
-              <p className="text-white/80">
+              <p className="text-sm md:text-base text-white/70">
                 Manage and track your development projects
               </p>
             </div>
@@ -151,17 +151,17 @@ export default function ProjectsPage() {
                   placeholder="Search projects..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 bg-black border-white/20 text-white placeholder:text-white/60 focus:border-white focus:ring-white"
+                  className="pl-10 h-11 md:h-12 bg-white/5 backdrop-blur-sm border-white/20 text-white placeholder:text-white/60 focus:border-white/40 focus:ring-white/20 transition-all"
                 />
               </div>
               
               {/* Sort By Select */}
               <div className="w-full sm:w-48">
                 <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="bg-black border-white/20 text-white focus:border-white focus:ring-white">
+                  <SelectTrigger className="h-11 md:h-12 bg-white/5 backdrop-blur-sm border-white/20 text-white focus:border-white/40 focus:ring-white/20">
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
-                  <SelectContent className="bg-black border-white/20">
+                  <SelectContent className="bg-gray-900 border-white/20 backdrop-blur-xl">
                     <SelectItem value="newest" className="text-white hover:bg-white/10 focus:bg-white/10">
                       Newest First
                     </SelectItem>
@@ -183,7 +183,7 @@ export default function ProjectsPage() {
               
               <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button className="bg-white text-black hover:bg-white/90 transition-colors">
+                  <Button className="h-11 md:h-12 bg-white text-black hover:bg-white/90 shadow-lg hover:shadow-xl transition-all">
                     <Plus className="mr-2 h-4 w-4" />
                     Create New Project
                   </Button>
@@ -202,12 +202,12 @@ export default function ProjectsPage() {
 
             {/* Error State */}
             {error && (
-              <div className="mb-8 p-4 bg-red-900/20 border border-red-500/30 rounded-lg">
-                <p className="text-red-400 mb-4">{error.message || String(error)}</p>
+              <div className="mb-6 md:mb-8 p-4 bg-red-900/20 backdrop-blur-sm border border-red-500/30 rounded-xl">
+                <p className="text-red-400 mb-4 text-sm md:text-base">{error.message || String(error)}</p>
                 <Button
                   onClick={() => fetchProjects()}
                   variant="outline"
-                  className="border-red-500/30 text-red-400 hover:bg-red-900/20"
+                  className="border-red-500/30 bg-red-900/10 text-red-400 hover:bg-red-900/20 transition-all"
                 >
                   <RefreshCw className="mr-2 h-4 w-4" />
                   Try Again
@@ -217,7 +217,7 @@ export default function ProjectsPage() {
 
             {/* Loading State */}
             {isLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <ProjectSkeleton key={i} />
                 ))}
@@ -227,13 +227,13 @@ export default function ProjectsPage() {
                 {/* Projects Grid */}
                 {filteredAndSortedProjects.length > 0 ? (
                   <motion.div
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"
                     variants={{
                       hidden: { opacity: 0 },
                       visible: {
                         opacity: 1,
                         transition: {
-                          staggerChildren: 0.1,
+                          staggerChildren: 0.08,
                         },
                       },
                     }}
